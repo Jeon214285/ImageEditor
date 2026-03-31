@@ -7,13 +7,20 @@
 <body>
     <h1>ImageEditor</h1>
 
-    <canvas id="Field" width="0" height="0">
+    <!-- 이미지 파일만 받도록 설정-->
+    <input type="file" id="imageInput" accept="image/*" style="display:none;">
+    <button onclick="imageUpload()">이미지 업로드</button>
 
-    </canvas>
+    <canvas id="Canvas" width="0" height="0"></canvas>
 
     <script>
         var canvas = document.getElementById('Canvas');
         var context = canvas.getContext('2d');
+        var imageInput = document.getElementById("imageInput");
+
+        function imageUpload() {
+            imageInput.click();
+        }
     </script>
 </body>
 </html>
