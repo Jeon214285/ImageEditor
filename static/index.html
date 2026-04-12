@@ -73,6 +73,67 @@
             link.click();
             document.body.removeChild(link);
         }
+
+        // 드래그 기능
+        let isDrawing = false;
+        let startX = 0;
+        let startY = 0;
+        let cleanImageData; // 이미지 원본 저장
+
+        let cropCoordinates = null; // 최종 좌표 저장
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (!cleanImageData) {
+                cleanImageData = context.getImageData(0, 0, canvas.width, canvas.height)
+            }
+            
+            isDrawing = true;
+
+            startX = e.offsetX;
+            startY = e.offsetY;
+
+            context.putImageData(cleanImageData, 0, 0);
+            cropCoordinates = null;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+
+            context.putImageData(cleanImageData, 0, 0);
+
+            const currentX = e.offsetX;
+            const currentY = e.offsetY;
+            const width = currentX - startX;
+            const height = currentY - startY;
+
+            context.beginPath();
+            context.strokeStype = '#808080';
+            context.lineWidth = 2;
+            context.setLineDash([6, 4]);
+            context.strokeRect(startX, startY, width, height);
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (!isDrawing) return;
+            isDrawing = false;
+
+            const endX = e.offsetX;
+            const endY = e.offsetY;
+            const width = endX - startX;
+            const height = endY - startY;
+
+            if (width === 0 || height === 0) {  // 박스가 그려지지 않을 경우
+                context.putImageData(cleanImageData, 0, 0);
+                return;
+            }
+
+            cropCoordinates = {
+                startX: startX,
+                startY: startY,
+                width: width,
+                height: height
+            };
+        });
     </script>
 </body>
 </html>
