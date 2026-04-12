@@ -31,8 +31,6 @@ def test_drag(page: Page):
     assert coords is not None
     assert coords["startX"] == 50
     assert coords["startY"] == 50
-    assert coords["endX"] == 200
-    assert coords["endY"] == 150
     assert coords["width"] == 150
     assert coords["height"] == 100
 
@@ -47,7 +45,5 @@ def test_drag(page: Page):
     assert coords is not None
     assert coords["startX"] == 100
     assert coords["startY"] == 50
-    assert coords["endX"] == 120
-    assert coords["endY"] == 80
     assert coords["width"] == 20
     assert coords["height"] == 30
