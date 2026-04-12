@@ -1,0 +1,116 @@
+var canvas = document.getElementById('Canvas');
+var context = canvas.getContext('2d');
+var imageInput = document.getElementById("imageInput");
+
+// 업로드 기능
+// 버튼을 눌렀을 때 imageInput을 클릭하게 함
+function imageUpload() {
+    imageInput.click();
+}
+
+// input의 파일이 변경되었을 때(이미지를 선택했을 때)
+imageInput.addEventListener('change', function(changeEvt) {
+    var file = changeEvt.target.files[0];  // 파일 읽기
+    if (!file) return;  // 파일이 없으면 리턴(종료)
+    
+    // 파일을 읽었을 경우
+    var reader = new FileReader()
+
+    reader.onload = function(loadEvt) {
+        var img = new Image();
+        
+        // 이미지 로드 완료시 canvas에 그림
+        img.onload = function() {
+            // 캔버스 크기를 이미지 크기로
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // 이미지 그리기
+            context.drawImage(img, 0, 0);
+        }
+        
+        // 이미지를 데이터 URL로 설정하여 로드
+        img.src = event.target.result;
+    }
+
+    // 파일을 읽어서 DataURL 형식으로 변환
+    reader.readAsDataURL(file);
+});
+
+// 다운로드 기능
+function imageDownload() {
+    if (canvas.width === 0 || canvas.height === 0) {
+        alert("다운로드할 이미지가 없습니다.");
+        return;
+    }
+
+    const dataURL = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = "image.png";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// 드래그 기능
+let isDrawing = false;
+let startX = 0;
+let startY = 0;
+let cleanImageData; // 이미지 원본 저장
+
+let cropCoordinates = null; // 최종 좌표 저장
+
+canvas.addEventListener('mousedown', (e) => {
+    if (!cleanImageData) {
+        cleanImageData = context.getImageData(0, 0, canvas.width, canvas.height)
+    }
+    
+    isDrawing = true;
+
+    startX = e.offsetX;
+    startY = e.offsetY;
+
+    context.putImageData(cleanImageData, 0, 0);
+    cropCoordinates = null;
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+
+    context.putImageData(cleanImageData, 0, 0);
+
+    const currentX = e.offsetX;
+    const currentY = e.offsetY;
+    const width = currentX - startX;
+    const height = currentY - startY;
+
+    context.beginPath();
+    context.strokeStype = '#808080';
+    context.lineWidth = 2;
+    context.setLineDash([6, 4]);
+    context.strokeRect(startX, startY, width, height);
+});
+
+canvas.addEventListener('mouseup', (e) => {
+    if (!isDrawing) return;
+    isDrawing = false;
+
+    const endX = e.offsetX;
+    const endY = e.offsetY;
+    const width = endX - startX;
+    const height = endY - startY;
+
+    if (width === 0 || height === 0) {  // 박스가 그려지지 않을 경우
+        context.putImageData(cleanImageData, 0, 0);
+        return;
+    }
+
+    cropCoordinates = {
+        startX: startX,
+        startY: startY,
+        width: width,
+        height: height
+    };
+});
