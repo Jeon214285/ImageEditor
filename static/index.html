@@ -6,10 +6,13 @@
 </head>
 <body>
     <h1>ImageEditor</h1>
-
+    <!-- 이미지 업로드 버튼 -->
     <!-- 이미지 파일만 받도록 설정, 화면에 보이지 않도록 함-->
     <input type="file" id="imageInput" accept="image/*" style="display:none;">
     <button onclick="imageUpload()">이미지 업로드</button>
+
+    <!-- 이미지 다운로드 버튼 -->
+    <button onclick="imageDownload()">이미지 다운로드</button>
     <br>
     <br>
     <canvas id="Canvas" width="0" height="0"></canvas>
@@ -19,6 +22,7 @@
         var context = canvas.getContext('2d');
         var imageInput = document.getElementById("imageInput");
 
+        // 업로드 기능
         // 버튼을 눌렀을 때 imageInput을 클릭하게 함
         function imageUpload() {
             imageInput.click();
@@ -51,9 +55,24 @@
 
             // 파일을 읽어서 DataURL 형식으로 변환
             reader.readAsDataURL(file);
-        })
+        });
 
+        // 다운로드 기능
+        function imageDownload() {
+            if (canvas.width === 0 || canvas.height === 0) {
+                alert("다운로드할 이미지가 없습니다.");
+                return;
+            }
 
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = "image.png";
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 </html>
