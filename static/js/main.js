@@ -2,6 +2,8 @@ var canvas = document.getElementById('Canvas');
 var context = canvas.getContext('2d');
 var imageInput = document.getElementById("imageInput");
 
+let originalImageData;
+
 // 업로드 기능
 // 버튼을 눌렀을 때 imageInput을 클릭하게 함
 function imageUpload() {
@@ -27,10 +29,16 @@ imageInput.addEventListener('change', function(changeEvt) {
 
             // 이미지 그리기
             context.drawImage(img, 0, 0);
+
+            canvas.style.marginLeft = "0px";
+            canvas.style.marginTop = "0px";
+
+            originalImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            cleanImageData = context.getImageData(0, 0, canvas.width, canvas.height);
         }
-        
+
         // 이미지를 데이터 URL로 설정하여 로드
-        img.src = event.target.result;
+        img.src = loadEvt.target.result;
     }
 
     // 파일을 읽어서 DataURL 형식으로 변환
@@ -101,8 +109,8 @@ canvas.addEventListener('mouseup', (e) => {
 
     const endX = e.offsetX;
     const endY = e.offsetY;
-    const width = endX - startX;
-    const height = endY - startY;
+    const width = Math.abs(endX - startX);
+    const height = Math.abs(endY - startY);
 
     if (width === 0 || height === 0) {  // 박스가 그려지지 않을 경우
         context.putImageData(cleanImageData, 0, 0);
@@ -116,3 +124,34 @@ canvas.addEventListener('mouseup', (e) => {
         height: height
     };
 });
+
+let cutImageData;  // 자른 이미지
+
+// 이미지 자르기
+function imageCut() {
+    if(!cropCoordinates) {
+        return;
+    }
+    x = cropCoordinates.startX;
+    y = cropCoordinates.startY;
+    w = cropCoordinates.width;
+    h = cropCoordinates.height;
+
+    context.putImageData(cleanImageData, 0, 0);
+    cutImageData = context.getImageData(x, y, w, h);
+
+    canvas.width = w;
+    canvas.height = h;
+
+    context.putImageData(cutImageData, 0, 0);
+
+    // 이미지 위치 조정
+    let currentLeft = parseInt(canvas.style.marginLeft || 0);
+    let currentTop = parseInt(canvas.style.marginTop || 0);
+
+    canvas.style.marginLeft = (currentLeft + x) + "px";
+    canvas.style.marginTop = (currentTop + y) + "px";
+
+    cropCoordinates = null;
+    cleanImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+};
