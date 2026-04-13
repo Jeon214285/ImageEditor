@@ -44,6 +44,8 @@ function imageDownload() {
         return;
     }
 
+    if(cleanImageData) {
+        context.putImageData(cleanImageData, 0, 0);}
     const dataURL = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.href = dataURL;
