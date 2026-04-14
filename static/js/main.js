@@ -1,171 +1,26 @@
-var canvas = document.getElementById('Canvas');
-var context = canvas.getContext('2d');
-var imageInput = document.getElementById("imageInput");
+// main.js
+import { state } from './state.js';
+import { setupCanvasEvents } from './events.js';
 
-let originalImageData;
+// 기존 actions.js 대신 기능별 파일에서 임포트
+import { imageUpload, setupImageInput } from './upload.js';
+import { imageDownload } from './download.js';
+import { imageCut } from './cut.js';
+import { imageRecovery } from './recovery.js';
 
-// 업로드 기능
-// 버튼을 눌렀을 때 imageInput을 클릭하게 함
-function imageUpload() {
-    imageInput.click();
-}
+// 1. DOM 요소들을 State에 등록
+document.addEventListener('DOMContentLoaded', () => {
+    state.canvas = document.getElementById('Canvas');
+    state.context = state.canvas.getContext('2d');
+    state.imageInput = document.getElementById("imageInput");
 
-// input의 파일이 변경되었을 때(이미지를 선택했을 때)
-imageInput.addEventListener('change', function(changeEvt) {
-    var file = changeEvt.target.files[0];  // 파일 읽기
-    if (!file) return;  // 파일이 없으면 리턴(종료)
-    
-    // 파일을 읽었을 경우
-    var reader = new FileReader()
-
-    reader.onload = function(loadEvt) {
-        var img = new Image();
-        
-        // 이미지 로드 완료시 canvas에 그림
-        img.onload = function() {
-            // 캔버스 크기를 이미지 크기로
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            // 이미지 그리기
-            context.drawImage(img, 0, 0);
-
-            canvas.style.marginLeft = "0px";
-            canvas.style.marginTop = "0px";
-
-            originalImageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            cleanImageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        }
-
-        // 이미지를 데이터 URL로 설정하여 로드
-        img.src = loadEvt.target.result;
-    }
-
-    // 파일을 읽어서 DataURL 형식으로 변환
-    reader.readAsDataURL(file);
+    // 2. 이벤트 리스너 세팅
+    setupImageInput();
+    setupCanvasEvents();
 });
 
-// 다운로드 기능
-function imageDownload() {
-    if (canvas.width === 0 || canvas.height === 0) {
-        alert("다운로드할 이미지가 없습니다.");
-        return;
-    }
-
-    if(cleanImageData) {
-        context.putImageData(cleanImageData, 0, 0);}
-    const dataURL = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = "image.png";
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// 드래그 기능
-let isDrawing = false;
-let startX = 0;
-let startY = 0;
-let cleanImageData; // 이미지 원본 저장
-
-let cropCoordinates = null; // 최종 좌표 저장
-
-canvas.addEventListener('mousedown', (e) => {
-    if (!cleanImageData) {
-        cleanImageData = context.getImageData(0, 0, canvas.width, canvas.height)
-    }
-    
-    isDrawing = true;
-
-    startX = e.offsetX;
-    startY = e.offsetY;
-
-    context.putImageData(cleanImageData, 0, 0);
-    cropCoordinates = null;
-});
-
-canvas.addEventListener('mousemove', (e) => {
-    if (!isDrawing) return;
-
-    context.putImageData(cleanImageData, 0, 0);
-
-    const currentX = e.offsetX;
-    const currentY = e.offsetY;
-    const width = currentX - startX;
-    const height = currentY - startY;
-
-    context.beginPath();
-    context.strokeStype = '#808080';
-    context.lineWidth = 2;
-    context.setLineDash([6, 4]);
-    context.strokeRect(startX, startY, width, height);
-});
-
-canvas.addEventListener('mouseup', (e) => {
-    if (!isDrawing) return;
-    isDrawing = false;
-
-    const endX = e.offsetX;
-    const endY = e.offsetY;
-    const width = Math.abs(endX - startX);
-    const height = Math.abs(endY - startY);
-
-    if (width === 0 || height === 0) {  // 박스가 그려지지 않을 경우
-        context.putImageData(cleanImageData, 0, 0);
-        return;
-    }
-
-    cropCoordinates = {
-        startX: startX,
-        startY: startY,
-        width: width,
-        height: height
-    };
-});
-
-let cutImageData;  // 자른 이미지
-
-// 이미지 자르기
-function imageCut() {
-    if(!cropCoordinates) return;
-    
-    x = cropCoordinates.startX;
-    y = cropCoordinates.startY;
-    w = cropCoordinates.width;
-    h = cropCoordinates.height;
-
-    context.putImageData(cleanImageData, 0, 0);
-    cutImageData = context.getImageData(x, y, w, h);
-
-    canvas.width = w;
-    canvas.height = h;
-
-    context.putImageData(cutImageData, 0, 0);
-
-    // 이미지 위치 조정
-    let currentLeft = parseInt(canvas.style.marginLeft || 0);
-    let currentTop = parseInt(canvas.style.marginTop || 0);
-
-    canvas.style.marginLeft = (currentLeft + x) + "px";
-    canvas.style.marginTop = (currentTop + y) + "px";
-
-    cropCoordinates = null;
-    cleanImageData = context.getImageData(0, 0, canvas.width, canvas.height);
-};
-
-function imageRecovery(){
-    if (!originalImageData) return;
-
-    canvas.width = originalImageData.width;
-    canvas.height = originalImageData.height;
-
-    context.putImageData(originalImageData, 0, 0);
-
-    canvas.style.marginLeft = "0px";
-    canvas.style.marginTop = "0px";
-
-    cropCoordinates = null;
-    cleanImageData = originalImageData;
-};
+// 3. HTML의 onclick 속성 및 Playwright 테스트를 위해 window 객체에 연결
+window.imageUpload = imageUpload;
+window.imageDownload = imageDownload;
+window.imageCut = imageCut;
+window.imageRecovery = imageRecovery;
