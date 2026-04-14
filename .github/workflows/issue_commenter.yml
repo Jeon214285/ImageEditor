@@ -15,9 +15,9 @@ jobs:
         with:
           github-token: ${{ secrets.MY_PERSONAL_TOKEN }}
           script: |
-            github.rest.issues.createComment{{
+            github.rest.issues.createComment({
               issue_number: context.payload.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: "이슈 확인 후 처리해드리겠습니다^^"
-            }}
+            })
