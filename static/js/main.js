@@ -129,9 +129,8 @@ let cutImageData;  // 자른 이미지
 
 // 이미지 자르기
 function imageCut() {
-    if(!cropCoordinates) {
-        return;
-    }
+    if(!cropCoordinates) return;
+    
     x = cropCoordinates.startX;
     y = cropCoordinates.startY;
     w = cropCoordinates.width;
@@ -154,4 +153,19 @@ function imageCut() {
 
     cropCoordinates = null;
     cleanImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+};
+
+function imageRecovery(){
+    if (!originalImageData) return;
+
+    canvas.width = originalImageData.width;
+    canvas.height = originalImageData.height;
+
+    context.putImageData(originalImageData, 0, 0);
+
+    canvas.style.marginLeft = "0px";
+    canvas.style.marginTop = "0px";
+
+    cropCoordinates = null;
+    cleanImageData = originalImageData;
 };
