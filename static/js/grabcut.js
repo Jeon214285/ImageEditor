@@ -1,7 +1,11 @@
 import { state } from './state.js';
 
 export async function backgroundRemoval() {
-    if (!state.cropCoordinates) return;
+    if (!state.cropCoordinates || document.body.style.cursor === "wait") return;
+
+    state.context.putImageData(state.cleanImageData, 0, 0);  // 드래그 지우고 실행
+    // 작업시간 고려 로딩 상태로 변경
+    document.body.style.cursor = "wait";
 
     state.canvas.toBlob(async (blob) => {
         if (!blob) return;
@@ -15,9 +19,7 @@ export async function backgroundRemoval() {
         formData.append('h', Math.floor(state.cropCoordinates.height));
 
         try{
-            // 작업시간 고려 로딩 상태로 변경
-            document.body.style.cursor = "wait";
-
+            
             const response = await fetch('/api/grabcut', {
                 method: 'POST',
                 body: formData
@@ -42,12 +44,14 @@ export async function backgroundRemoval() {
             img.onload = () => {
                 state.context.clearRect(0, 0, state.canvas.width, state.canvas.height);
                 state.context.drawImage(img, 0, 0);
+                state.cleanImageData = state.context.getImageData(0, 0, state.canvas.width, state.canvas.height);
                 URL.revokeObjectURL(imgURL); // 메모리 누수 방지
             };
             img.src = imgURL;
             
         } finally {
             document.body.style.cursor = 'default';
+            state.cropCoordinates = null; // 2번 누름 방지
         }
     }, 'image/png');   
 }
