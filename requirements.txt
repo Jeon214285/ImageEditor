@@ -4,3 +4,5 @@ opencv-python
 pytest
 httpx
 pytest-playwright
+python-multipart
+numpy
