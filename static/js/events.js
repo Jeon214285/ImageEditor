@@ -11,7 +11,7 @@ function mouseDown(e) {
     state.startY = e.offsetY;
 
     state.context.putImageData(state.cleanImageData, 0, 0);
-    setCropCoordiates(null);
+    setCropCoordinates(null);
 }
 
 // 마우스를 움직일 때
