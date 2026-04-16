@@ -1,0 +1,30 @@
+name: Docker Verify
+on:
+  pull_request: 
+  push:
+    branches: [ "main" ]
+jobs:
+  docker-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t spamcheck:ci .
+
+      - name: Run Container
+        run: |
+          docker run -d --name imageeditor_ci \
+            -e PORT=10000 \
+            -p 10000:10000 \
+            imageeditor:ci
+        
+      - name: Check Container is running
+        run: |
+          sleep 3
+          docker ps | grep imageeditor_ci
+
+      - name: Clean up
+        if: always()
+        run: docker rm -f imageeditor_ci || true
