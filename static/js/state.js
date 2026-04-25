@@ -14,6 +14,8 @@ export const state = {
     blurPx: 50
 };
 
+window.state = state;
+
 export function setCropCoordinates(coords){
     state.cropCoordinates = coords;
     window.cropCoordinates = coords;

@@ -12,7 +12,26 @@ def start_test_server():
     server_process.terminate()
 
 def get_canvas_data(page: Page):
-        return page.evaluate('document.getElementById("Canvas").toDataURL()')
+    return page.evaluate('document.getElementById("Canvas").toDataURL()')
+
+def test_control(page: Page):
+    page.goto("http://localhost:8000")
+
+    slider = page.locator("id=blurPx")
+    slider.wait_for(state="visible")
+
+    initial_slider_value = int(slider.input_value())
+    initial_state_value = page.evaluate("() => window.state.blurPx")
+
+    assert initial_slider_value == initial_state_value
+
+    slider.fill(str(80))
+
+    updated_slider_value = int(slider.input_value())
+    updated_state_value = page.evaluate("() => window.state.blurPx")
+
+    assert updated_slider_value == 80
+    assert updated_state_value == 80
 
 def test_blur(page: Page):
     # 이미지 불러오기
