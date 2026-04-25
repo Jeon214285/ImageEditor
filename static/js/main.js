@@ -6,6 +6,7 @@ import { imageDownload } from './download.js';
 import { imageCut } from './cut.js';
 import { imageRecovery } from './recovery.js';
 import { backgroundRemoval } from './grabcut.js';
+import { controlBlur, imageBlur } from './blur.js';
 
 // DOM 요소들을 State에 등록
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,3 +25,5 @@ window.imageDownload = imageDownload;
 window.imageCut = imageCut;
 window.imageRecovery = imageRecovery;
 window.groundRemoval = backgroundRemoval;
+window.imageBlur = imageBlur;
+window.controlBlur = controlBlur;
