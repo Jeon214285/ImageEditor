@@ -6,6 +6,7 @@ export async function backgroundRemoval() {
     state.context.putImageData(state.cleanImageData, 0, 0);  // 드래그 지우고 실행
     // 작업시간 고려 로딩 상태로 변경
     document.body.style.cursor = "wait";
+    state.canvas.style.cursor = "wait";
 
     state.canvas.toBlob(async (blob) => {
         if (!blob) return;
@@ -51,6 +52,7 @@ export async function backgroundRemoval() {
             
         } finally {
             document.body.style.cursor = 'default';
+            state.canvas.style.cursor = "default";
             state.cropCoordinates = null; // 2번 누름 방지
         }
     }, 'image/png');   
