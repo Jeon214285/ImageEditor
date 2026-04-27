@@ -48,17 +48,6 @@ def test_image_download(page: Page):
 def test_image_download_without_image(page: Page):
     page.goto("http://localhost:8000")
     page.wait_for_timeout(500)
-    
-    with page.expect_event("dialog") as dialog_info:
-        page.get_by_role("button", name="이미지 다운로드").click()
-        page.wait_for_timeout(200)
-
-    assert "다운로드할 이미지가 없습니다." in dialog_info.value.message
-    dialog_info.value.accept()
-
-def test_image_download_without_image(page: Page):
-    page.goto("http://localhost:8000")
-    page.wait_for_timeout(500)
 
     dialog_messages = []
 
