@@ -23,7 +23,25 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          playwright install
+          playwright install --with-deps
+          pip install pytest-cov==7.1.0
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-      - name: Run tests
-        run: pytest
+      - name: Run Python tests & coverage
+        run: pytest tests/ --cov=. --cov-report=term --cov-report=html
+
+      - name: Run js coverage
+        run: |
+          npx c8 --temp-directory .js_coverage report --reporter=text --reporter=html
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: js-coverage-reports
+          path: |
+            coverage/
+            htmlcov/
