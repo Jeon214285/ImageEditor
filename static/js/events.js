@@ -44,6 +44,7 @@ function mouseUp(e) {
 
     if (width === 0 || height === 0) {
         state.context.putImageData(state.cleanImageData, 0, 0);
+        setCropCoordinates(null);
         return;
     }
 

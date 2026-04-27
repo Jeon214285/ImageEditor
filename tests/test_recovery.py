@@ -11,7 +11,7 @@ def start_test_server():
     yield
     server_process.terminate()
 
-# 자르기 후 복구하는 기능에 대한테스트
+# 자르기 후 복구하는 기능에 대한 테스트
 def test_cut_recovery(page: Page):
     # 이미지 불러오기
     page.goto("http://localhost:8000")
@@ -38,10 +38,10 @@ def test_cut_recovery(page: Page):
     # 자르기 버튼 클릭
     page.get_by_role("button", name="자르기").click()
 
-    # 4. 복구 버튼 클릭
+    # 복구 버튼 클릭
     page.get_by_role("button", name="원래대로").click()
 
-    # 5. 복구 후 상태 저장
+    # 복구 후 상태 저장
     recovered_state = page.evaluate("""() => {
         const c = document.getElementById('Canvas');
         return {
@@ -63,3 +63,23 @@ def test_cut_recovery(page: Page):
     # null로 비워졌는가?
     coords = page.evaluate("window.cropCoordinates")
     assert coords is None
+
+def test_cut_recovery_without_image(page: Page):
+    page.goto("http://localhost:8000")
+    page.wait_for_timeout(500)
+
+    inital_state = page.evaluate("""() => {
+        const c = document.getElementById('Canvas');
+        return { width: c.width, height: c.height };
+    }""")
+
+    page.get_by_role("button", name="원래대로").click()
+    page.wait_for_timeout(200)
+
+    after_state = page.evaluate("""() => {
+        const c = document.getElementById('Canvas');
+        return { width: c.width, height: c.height };
+    }""")
+
+    assert inital_state['width'] == after_state['width']
+    assert inital_state['height'] == after_state['height']
