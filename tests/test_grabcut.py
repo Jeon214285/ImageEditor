@@ -59,3 +59,30 @@ def test_grabcut(page: Page):
     # 이미지가 변했는지 테스트
     assert pure_image_data != after_image_data
     assert boxed_image_data != after_image_data
+
+@pytest.mark.parametrize("status_code, expected_alert", [
+     (400, "선택 영역이 너무 작거나"),
+     (500, "서버 내부 오류"),
+     (418, "알 수 없는 오류 발생: 418")
+])
+def test_grabcut_error(page: Page, status_code, expected_alert):
+    page.goto("http://localhost:8000")
+    page.set_input_files("#imageInput", test_image_path)
+    page.wait_for_timeout(500)
+
+    # 임의의 박스 그리기
+    canvas = page.locator("#Canvas")
+    box = canvas.bounding_box()
+    page.mouse.move(box['x'] + 20, box['y'] + 80)
+    page.mouse.down()
+    page.mouse.move(box['x'] + 180, box['y'] + 110)
+    page.mouse.up()
+
+    # error 검증
+    page.route("**/api/grabcut", lambda route: route.fulfill(status=status_code))
+    
+    with page.expect_event("dialog") as dialog_info:
+        page.get_by_role("button", name="배경 제거").click()
+    
+    assert expected_alert in dialog_info.value.message
+    dialog_info.value.accept()

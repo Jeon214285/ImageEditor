@@ -12,7 +12,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # GrabCut
 app.include_router(grabcut_router)
 
-# 메인 체이지 (/) 처리
+# 메인 페이지 (/) 처리
 @app.get("/", response_class=HTMLResponse)
 def home():
     with open("static/index.html", encoding="utf-8") as f:

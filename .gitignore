@@ -9,3 +9,5 @@ venv/
 .pytest_cache/
 .coverage
 htmlcov/
+.js_coverage/
+coverage/
