@@ -33,7 +33,7 @@ def test_control(page: Page):
     assert updated_slider_value == 80
     assert updated_state_value == 80
 
-def test_blur(page: Page):
+def test_blur_with_selection(page: Page):
     # 이미지 불러오기
     page.goto("http://localhost:8000")
     page.set_input_files("#imageInput", test_image_path)
@@ -80,3 +80,27 @@ def test_blur(page: Page):
 
     assert after_image_data != pure_image_data  # 원본이랑 동일한지
     assert after_image_data != boxed_image_data
+
+def test_blur_without_selection(page: Page):
+    page.goto("http://localhost:8000")
+    page.set_input_files("#imageInput", test_image_path)
+    page.wait_for_timeout(500)
+
+    initial_info = page.evaluate("""() => {
+        const c = document.getElementById('Canvas');
+        return { width: c.width, height: c.height };
+    }""")
+    pure_image_data = get_canvas_data(page)
+
+    page.get_by_role("button", name="흐리게").click()
+    page.wait_for_timeout(100)
+
+    after_info = page.evaluate("""() => {
+        const c = document.getElementById('Canvas');
+        return { width: c.width, height: c.height };
+    }""")
+    after_image_data = get_canvas_data(page)
+
+    assert initial_info["width"] == after_info["width"]
+    assert initial_info["height"] == after_info["height"]
+    assert pure_image_data == after_image_data

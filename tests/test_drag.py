@@ -47,3 +47,13 @@ def test_drag(page: Page):
     assert coords["startY"] == 50
     assert coords["width"] == 20
     assert coords["height"] == 30
+
+    # 세 번째 박스 드래그 (드래그 X)
+    page.mouse.move(box['x'] + 100, box['y'] + 50)
+    page.mouse.down()
+    page.mouse.move(box['x'] + 100, box['y'] + 50)
+    page.mouse.up()
+
+    coords = page.evaluate("cropCoordinates")
+
+    assert coords is None
