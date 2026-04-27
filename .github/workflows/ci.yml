@@ -32,7 +32,7 @@ jobs:
           node-version: '18'
 
       - name: Run Python tests & coverage
-        run: pytest tests/ --cov=. --cov-report=term --cov-report=html
+        run: pytest tests/ --cov=app --cov-report=term --cov-report=html
 
       - name: Run js coverage
         run: |
