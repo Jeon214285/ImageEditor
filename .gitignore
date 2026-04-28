@@ -11,3 +11,4 @@ venv/
 htmlcov/
 .js_coverage/
 coverage/
+.hypothesis/
