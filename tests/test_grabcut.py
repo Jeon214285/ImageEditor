@@ -44,14 +44,18 @@ def test_grabcut(page: Page):
         # 마우스 커서 로딩중인지 확인
         expect(page.locator("body")).to_have_css("cursor", "wait")
 
+        # 버튼 비활성화 확인
+        expect(page.get_by_role("button", name="배경 제거")).to_be_disabled()
+
     # 정상(200)인지 확인
     assert response_info.value.ok
 
-    # 마우스 커서 돌아왔는지 확인
-    expect(page.locator("body")).to_have_css("cursor", "default")
-
     # 이미지 그릴 대기시간
     page.wait_for_timeout(100)
+
+    # 마우스 커서 & 버튼 돌아왔는지 확인
+    expect(page.locator("body")).to_have_css("cursor", "default")
+    expect(page.get_by_role("button", name="배경 제거")).to_be_enabled()
     
     # 최종 이미지
     after_image_data = get_canvas_data(page)
@@ -60,11 +64,17 @@ def test_grabcut(page: Page):
     assert pure_image_data != after_image_data
     assert boxed_image_data != after_image_data
 
+    # 배경 제거를 다시 눌렀을 때, 아무것도 실행이 되지 않아야 함
+    page.get_by_role("button", name="배경 제거").click()
+    expect(page.locator("body")).not_to_have_css("cursor", "wait")
+    expect(page.get_by_role("button", name="배경 제거")).to_be_enabled()
+    
 @pytest.mark.parametrize("status_code, expected_alert", [
      (400, "선택 영역이 너무 작거나"),
      (500, "서버 내부 오류"),
      (418, "알 수 없는 오류 발생: 418")
 ])
+
 def test_grabcut_error(page: Page, status_code, expected_alert):
     page.goto("http://localhost:8000")
     page.set_input_files("#imageInput", test_image_path)
@@ -86,3 +96,6 @@ def test_grabcut_error(page: Page, status_code, expected_alert):
     
     assert expected_alert in dialog_info.value.message
     dialog_info.value.accept()
+
+    expect(page.locator("body")).to_have_css("cursor", "default")
+    expect(page.get_by_role("button", name="배경 제거")).to_be_enabled()
