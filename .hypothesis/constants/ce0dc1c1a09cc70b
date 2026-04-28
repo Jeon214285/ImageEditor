@@ -1,0 +1,4 @@
+# file: C:\Users\214285\Desktop\대학\수업\4-1\인공지능소프트웨어개발및파이프라인\실습\ImageEditor\app\grabcut.py
+# hypothesis_version: 6.151.10
+
+[255, 400, 500, '.png', '/api/grabcut', 'image/png', 'uint8', '서버 내부 오류가 발생했습니다.', '유효하지 않은 이미지입니다.', '이미지 인코딩에 실패했습니다.']
