@@ -14,3 +14,9 @@ canvas {
 
     cursor: crosshair;
 }
+
+button:disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    transform: none;
+}
