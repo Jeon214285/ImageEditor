@@ -25,6 +25,7 @@ jobs:
           pip install -r requirements.txt
           playwright install --with-deps
           pip install pytest-cov==7.1.0
+          pip install hypothesis
       
       - name: Set up Node.js
         uses: actions/setup-node@v3

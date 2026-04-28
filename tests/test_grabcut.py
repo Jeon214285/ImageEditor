@@ -43,12 +43,17 @@ def test_grabcut(page: Page):
 
         # 마우스 커서 로딩중인지 확인
         expect(page.locator("body")).to_have_css("cursor", "wait")
+        expect(page.locator("#Canvas")).to_have_css("cursor", "wait")
 
         # 버튼 비활성화 확인
         expect(page.get_by_role("button", name="배경 제거")).to_be_disabled()
 
     # 정상(200)인지 확인
     assert response_info.value.ok
+
+    # 마우스 커서 돌아왔는지 확인
+    expect(page.locator("body")).to_have_css("cursor", "default")
+    expect(page.locator("#Canvas")).to_have_css("cursor", "default")
 
     # 이미지 그릴 대기시간
     page.wait_for_timeout(100)
