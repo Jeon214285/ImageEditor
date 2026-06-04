@@ -58,6 +58,16 @@ function mouseUp(e) {
         width: width,
         height: height
     });
+
+    fetch('/api/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            level: 'DEBUG',
+            action: 'AREA_SELECTED',
+            details: `COOR=(${finalStartX}, ${finalStartY}) | AREA=${width}x${height}px`
+        })
+    }).catch(err => console.error("로그 전송 실패", err));
 }
 
 export function setupCanvasEvents() {
