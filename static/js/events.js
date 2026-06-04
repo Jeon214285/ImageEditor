@@ -48,9 +48,13 @@ function mouseUp(e) {
         return;
     }
 
+    // 역방향 드래그로 해도 정상 작동하도록
+    const finalStartX = Math.min(state.startX, endX);
+    const finalStartY = Math.min(state.startY, endY);
+
     setCropCoordinates({
-        startX: state.startX,
-        startY: state.startY,
+        startX: finalStartX,
+        startY: finalStartY,
         width: width,
         height: height
     });
