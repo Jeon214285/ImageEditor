@@ -4,13 +4,18 @@ from fastapi.staticfiles import StaticFiles
 from app.grabcut import router as grabcut_router
 import logging
 from pydantic import BaseModel
+from app.issue import *
 
 # 로그 포맷
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(filename)s:%(lineno)d (%(funcName)s) | %(message)s"
 )
-logger = logging.getLogger("ImageEditor")
+logger = logging.getLogger()
+
+github_hadler = GitHubIssueHandler()
+github_hadler.setLevel(logging.ERROR)  # ERROR 이상만 보냄
+logger.addHandler(github_hadler)
 
 class LogData(BaseModel):
     level: str = 'INFO'  # 기본값 INFO
@@ -41,7 +46,6 @@ async def favicon():
 @app.post("/api/log")
 async def collect_log(data: LogData):
     log_message = f"{data.action} | {data.details}"
-
     log_level = data.level.upper()
 
     if log_level == 'WARNING':
