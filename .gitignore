@@ -12,3 +12,8 @@ htmlcov/
 .js_coverage/
 coverage/
 .hypothesis/
+ml/data/raw_data/
+ml/data/images/
+ml/data/labels/
+ml/runs/
+*.pt
