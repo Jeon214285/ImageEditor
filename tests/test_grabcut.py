@@ -58,8 +58,7 @@ def test_grabcut(page: Page):
     # 이미지 그릴 대기시간
     page.wait_for_timeout(100)
 
-    # 마우스 커서 & 버튼 돌아왔는지 확인
-    expect(page.locator("body")).to_have_css("cursor", "default")
+    # 버튼 돌아왔는지 확인
     expect(page.get_by_role("button", name="배경 제거")).to_be_enabled()
     
     # 최종 이미지

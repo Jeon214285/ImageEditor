@@ -34,7 +34,7 @@ async def process_face_detect(
         # 이미지가 없을 경우
         if img is None:
             logger.warning("FACE_DETECT_FAILED | WARINIG=Invalid Image Format or Corrupted data.")
-            return Response(status_code=400,
+            return Response(status_code=415,
                             content="유효하지 않은 이미지입니다.")
         
         # 얼굴 탐지 로직

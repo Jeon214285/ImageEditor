@@ -74,7 +74,7 @@ export async function faceDetect() {
                     })
                 }).catch(err => console.error("에러 로그 전송 실패", err));
 
-                if (response.status === 400) {
+                if (response.status === 415) {
                     alert("유효하지 않은 이미지입니다.");
                 } else if (response.status === 500) {
                     alert("서버 내부 오류가 발생했습니다.");
