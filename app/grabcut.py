@@ -26,7 +26,7 @@ async def process_grabcut(
         # 이미지가 없을 경우
         if img is None:
             logger.warning("GRABCUT_FAILED | WARINIG=Invalid Image Format or Corrupted data.")
-            return Response(status_code=400,
+            return Response(status_code=415,
                             content="유효하지 않은 이미지입니다.")
         
         img_h, img_w = img.shape[:2]
@@ -41,7 +41,7 @@ async def process_grabcut(
 
         if w <= 1 or h <= 1:
             logger.warning(f"GRABCUT_BAD_REQUEST | COOR=({x}, {y}) | AREA={w}x{h}px | WARNING=Rect Too Small or Out of Bounds.")
-            return Response(status_code=400,
+            return Response(status_code=422,
                             content="선택 영역이 너무 작거나 범위를 벗어났습니다.")
         
         rect = (x, y, w, h)

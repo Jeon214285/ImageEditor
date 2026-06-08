@@ -68,7 +68,9 @@ export async function backgroundRemoval() {
                     })
                 }).catch(err => console.error("에러 로그 전송 실패", err));
 
-                if (response.status === 400) {
+                if (response.status === 415) {
+                    alert("유효하지 않은 이미지입니다.");
+                } else if (response.status === 422) {
                     alert("선택 영역이 너무 작거나 범위를 벗어났습니다.");
                 } else if (response.status === 500) {
                     alert("서버 내부 오류가 발생했습니다.");
