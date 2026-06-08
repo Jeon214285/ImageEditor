@@ -11,7 +11,7 @@ function drawDetectedObjects(objects, color) {
 
     objects.forEach(obj => {
         // x, y 좌표와 너비, 높이를 이용해 사각형 그리기
-        state.context.strokeRect(obj.x, obj.y, obj.width, obj.height);
+        state.context.strokeRect(obj.x, obj.y, obj.w, obj.h);
     });
 
     // 기존 상태 복구

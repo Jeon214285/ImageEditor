@@ -53,11 +53,15 @@ def test_face_detect(page: Page):
 
     # stub: 서버가 가짜 좌표를 반환하도록 조작
     def stub_success_response(route):
-        fake_coords = [{"x": 50, "y": 50, "w": 100, "h": 100}]
+        # 변경된 부분: 실제 API가 반환하는 형태(dict)로 맞춰줍니다.
+        fake_response = {
+            "faces": [{"x": 50, "y": 50, "w": 100, "h": 100}],
+            "count": 1
+        }
         route.fulfill(
             status=200,
             content_type="application/json",
-            body=json.dumps(fake_coords)
+            body=json.dumps(fake_response)
         )
     page.route("**/api/detect", stub_success_response)
 
@@ -108,9 +112,10 @@ def test_detect_error(page: Page, status_code, expected_alert):
     with page.expect_event("dialog") as dialog_info:
         page.get_by_role("button", name="얼굴 탐지").click()
     
-    # alert 메시지 검증
-    assert expected_alert in dialog_info.value.message
-    dialog_info.value.accept()
+    actual_message = dialog_info.value.message  # 메시지 저장
+    dialog_info.value.accept()  # 닫기
+
+    assert expected_alert in actual_message  # 저장된 메시지로 검증
 
     # 에러 후 UI 복구 상태 검증
     expect(page.locator("body")).to_have_css("cursor", "default")

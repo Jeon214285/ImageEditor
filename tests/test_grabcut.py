@@ -74,12 +74,11 @@ def test_grabcut(page: Page):
     expect(page.get_by_role("button", name="배경 제거")).to_be_enabled()
     
 @pytest.mark.parametrize("status_code, expected_alert", [
-     (415, "유효하지 않는 이미지입니다."),
+     (415, "유효하지 않은 이미지입니다."),
      (422, "선택 영역이 너무 작거나"),
      (500, "서버 내부 오류"),
      (418, "알 수 없는 오류 발생: 418")
 ])
-
 def test_grabcut_error(page: Page, status_code, expected_alert):
     page.goto("http://localhost:8000")
     page.set_input_files("#imageInput", test_image_path)
@@ -99,8 +98,10 @@ def test_grabcut_error(page: Page, status_code, expected_alert):
     with page.expect_event("dialog") as dialog_info:
         page.get_by_role("button", name="배경 제거").click()
     
-    assert expected_alert in dialog_info.value.message
-    dialog_info.value.accept()
+    actual_message = dialog_info.value.message  # 메시지 저장
+    dialog_info.value.accept()  # 닫기
 
+    assert expected_alert in actual_message  # 저장된 메시지로 검증
+    
     expect(page.locator("body")).to_have_css("cursor", "default")
     expect(page.get_by_role("button", name="배경 제거")).to_be_enabled()

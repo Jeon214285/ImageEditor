@@ -40,10 +40,17 @@ def test_detect_api():
 
     with open(test_image_path, "rb") as image_file:
         response = client.post(
-            "/api/detect/",
+            "/api/detect",
             files={"image": ("test.png", image_file, "image/png")},
         )
 
     assert response.status_code == 200
-    assert isinstance(response.json, list)  # json 형식으로 반환하는지 확인
+    response_data = response.json()
+
+    assert isinstance(response_data, dict)  # json 형식으로 반환하는지 확인
+
+    assert "count" in response_data
+    assert "faces" in response_data
+    
+    assert isinstance(response_data["faces"], list)
     # assert len(result) > 0  # 얼굴이 없을 수 있으므로 테스트 X

@@ -12,12 +12,22 @@ VALID_FORM_DATA = {  # 422 error 방지
 }
 
 @given(st.binary(min_size=1, max_size=50000))
-def test_hypothesis_fuzzung(raw_bytes):
+def test_hypothesis_fuzzing_grabcut(raw_bytes):
     response = client.post(
         "/api/grabcut",
         files={"image": ("fuzz_test.png", raw_bytes, "image/png")},
         data=VALID_FORM_DATA
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 415
+    assert response.text == "유효하지 않은 이미지입니다."
+
+@given(st.binary(min_size=1, max_size=50000))
+def test_hypothesis_fuzzing_detect(raw_bytes):
+    response = client.post(
+        "/api/detect",
+        files={"image": ("fuzz_test.png", raw_bytes, "image/png")}
+    )
+
+    assert response.status_code == 415
     assert response.text == "유효하지 않은 이미지입니다."

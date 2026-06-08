@@ -50,7 +50,7 @@ async def process_face_detect(
         detected_faces = []
         for box in boxes:
             x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
-            detected_faces.append({"x": x1, "y": y1, "width": x2 - x1, "height": y2 - y1})
+            detected_faces.append({"x": x1, "y": y1, "w": x2 - x1, "h": y2 - y1})
             
             faces_count += 1
 
