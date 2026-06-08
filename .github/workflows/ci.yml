@@ -32,6 +32,12 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Start FastAPI server in background
+        run: uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+
+      - name: Wait for server to be ready
+        run: sleep 5
+
       - name: Run Python tests & coverage
         run: pytest tests/ --cov=app --cov-report=term --cov-report=html
 
