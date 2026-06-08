@@ -76,6 +76,6 @@ async def process_grabcut(
                         media_type='image/png')
     
     except Exception as e:
-        logger.error(f"GRABCUT_SERVER_ERROR | ERROR={str(e)}", exc_info=True)
+        logger.error(f"GRABCUT_SERVER_ERROR | ERROR={str(e)}")
         return Response(status_code=500,
                         content="서버 내부 오류가 발생했습니다.")

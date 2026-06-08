@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from app.grabcut import router as grabcut_router
+from app.detect import router as detect_router
 import logging
 from pydantic import BaseModel
 from app.issue import *
@@ -30,6 +31,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # GrabCut
 app.include_router(grabcut_router)
+
+# Detect
+app.include_router(detect_router)
 
 # 메인 페이지 (/) 처리
 @app.get("/", response_class=HTMLResponse)

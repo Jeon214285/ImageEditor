@@ -19,12 +19,14 @@
     <button onclick="imageDownload()">이미지 다운로드</button>
     <br>
     <!-- 이미지 자르기 버튼 -->
-     <button onclick="imageCut()">자르기</button>
-     <button id="grabcutBtn", onclick="groundRemoval()">배경 제거</button>
-     <button onclick="imageBlur()">흐리게</button>
-     <input type="range" id="blurPx" min="0" max="100" value="50"
-     onchange="controlBlur()">
-     <button onclick="imageRecovery()">원래대로</button>
+    <button onclick="imageCut()">자르기</button>
+    <button id="grabcutBtn", onclick="backgroundRemoval()">배경 제거</button>
+    <button onclick="imageBlur()">흐리게</button>
+    <input type="range" id="blurPx" min="0" max="100" value="50"
+    onchange="controlBlur()">
+    <button onclick="imageRecovery()">원래대로</button>
+    <br>
+    <button id="faceDetectBtn", onclick="faceDetect()">얼굴 탐지</button>
     <br>
     <br>
     <canvas id="Canvas" width="0" height="0"></canvas>

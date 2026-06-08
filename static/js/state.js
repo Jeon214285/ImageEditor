@@ -11,7 +11,9 @@ export const state = {
     startX: 0,
     startY: 0,
 
-    blurPx: 50
+    blurPx: 50,
+
+    faceDetect: null,
 };
 
 window.state = state;

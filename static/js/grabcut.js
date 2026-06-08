@@ -47,7 +47,7 @@ export async function backgroundRemoval() {
         // 소요 시간 측정
         const startTime = performance.now()
 
-        try{
+        try {
             const response = await fetch('/api/grabcut', {
                 method: 'POST',
                 body: formData
