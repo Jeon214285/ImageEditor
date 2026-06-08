@@ -16,6 +16,7 @@ def test_page():
     assert "흐리게" in response.text
     assert 'id="blurPx"' in response.text
     assert "원래대로" in response.text
+    assert "얼굴 탐지" in response.text
 
 def test_favicon():
     response = client.get("/favicon.ico")

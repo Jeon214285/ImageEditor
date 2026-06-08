@@ -75,7 +75,8 @@ def test_grabcut(page: Page):
     expect(page.get_by_role("button", name="배경 제거")).to_be_enabled()
     
 @pytest.mark.parametrize("status_code, expected_alert", [
-     (400, "선택 영역이 너무 작거나"),
+     (415, "유효하지 않는 이미지입니다."),
+     (422, "선택 영역이 너무 작거나"),
      (500, "서버 내부 오류"),
      (418, "알 수 없는 오류 발생: 418")
 ])
