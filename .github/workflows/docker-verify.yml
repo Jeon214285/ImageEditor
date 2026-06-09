@@ -25,7 +25,7 @@ jobs:
       - name: Check Container is running
         run: |
           sleep 3
-          docker logs imegeeditor_ci
+          docker logs imageeditor_ci
           docker ps | grep imageeditor_ci
 
       - name: Clean up
