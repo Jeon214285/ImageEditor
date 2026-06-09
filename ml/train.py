@@ -4,8 +4,12 @@ from ultralytics import YOLO, settings
 from split_data import split_data
 import mlflow
 
+class YOLOModelWrapper(mlflow.pyfunc.PythonModel):
+    pass
+
 BASE_DIR = os.path.dirname(__file__)
 YAML_PATH = os.path.join(BASE_DIR, "data.yaml")
+PROJECT_DIR = os.path.join(BASE_DIR, "runs") 
 
 experiment_name = "face_detector-local"
 
@@ -24,17 +28,28 @@ split_data() # 데이터 준비
 
 model = YOLO("yolo26n.pt")
 
-results = model.train(
-    data=YAML_PATH,
-    epochs=1,
-    imgsz=640,
-    batch=16,
-    project="runs",
-    name="face_detector",
-    exist_ok=True,
-    device=0,
-    workers=0
-)
+with mlflow.start_run() as run:
+    results = model.train(
+        data=YAML_PATH,
+        epochs=10,
+        imgsz=640,
+        batch=16,
+        project=PROJECT_DIR,
+        name="face_detector",
+        exist_ok=True,
+        device=0,
+        workers=0
+    )
 
-best_model_path = os.path.join(BASE_DIR, "runs", "face_detector", "weights", "best.pt")
-print(f"Model saved to: {best_model_path}")
+    best_model_path = os.path.join(PROJECT_DIR, "face_detector", "weights", "best.pt")
+    print(f"Model saved to: {best_model_path}")
+
+    # 모델 저장
+    model_info = mlflow.pyfunc.log_model(
+        name="model",
+        python_model=YOLOModelWrapper(),
+        artifacts={"best.pt": best_model_path},
+        registered_model_name='face-detector'
+    )
+
+    # mlflow.log_artifact(best_model_path, artifact_path="weights")  # artifact 저장  # 중복 저장을 방지하여 사용X
