@@ -29,17 +29,20 @@ split_data() # 데이터 준비
 
 try:
     weight_path = mlflow.artifacts.download_artifacts(
-        artifact_uri=MODEL_URI+"/artifacts/last.pt"
+        artifact_uri="models:/face-detector@challenger/artifacts/last.pt"
     )
+    is_resume = True
     print("INFO: LOADED last.pt")
 except:
     weight_path = "yolo26n.pt"
+    is_resume = False
     print("INFO: LOADED yolo26n.pt")
 
 model = YOLO(weight_path)
 
 with mlflow.start_run() as run:
     results = model.train(
+        resume=is_resume,
         data=YAML_PATH,
         epochs=10,
         imgsz=640,
