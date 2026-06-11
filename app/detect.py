@@ -6,19 +6,18 @@ import numpy as np
 import logging
 import time
 from ultralytics import YOLO
+from app.model_loader import load_model
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent 
-MODEL_PATH = PROJECT_ROOT / "ml" / "runs" / "face_detector" / "weights" / "best.pt"
-
-# CI/CD 환경 대비
-load_path = MODEL_PATH if MODEL_PATH.exists() else "yolov8n.pt"
-
-print(f"INFO: Loading YOLO Model from {load_path}")
-model = YOLO(load_path)
+try:
+    model = load_model()
+    logger.info("MODEL_LOAD_SUCCESS | LOADED YOLO MODEL FROM MLFLOW")
+except Exception as e:
+    model = YOLO('yolo26n.pt')  # 모델이 없으면 기본모델(CI/CD 대비)
+    logger.warning(f"MODEL_LOAD_FAILED | EXCEPTION={e} | LOADED DEFAULT YOLO MODEL")
 
 @router.post("/api/detect")
 async def process_face_detect(
@@ -41,7 +40,8 @@ async def process_face_detect(
         algo_start_time = time.time()
 
         # 모델 추론
-        results = model.predict(source=img, imgsz=640, conf=0.5, verbose=False)
+        # results = model.predict(source=img, imgsz=640, conf=0.5, verbose=False)
+        results = model([img])
 
         # 탐지된 객체 정보 추출
         faces_count = 0

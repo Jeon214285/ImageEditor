@@ -5,12 +5,16 @@ import mlflow
 _model = None
 
 def load_model():
+    global _model
+
+    if _model is not None:
+        return _model
+    
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     weight_path = mlflow.artifacts.download_artifacts(
         artifact_uri=MODEL_URI+"/artifacts/best.pt"
     )
+    
+    _model = YOLO(weight_path)
 
-    global _model
-    if _model is None:
-        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-        _model = YOLO(weight_path)
-    return
+    return _model
