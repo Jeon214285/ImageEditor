@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from ultralytics import YOLO, settings
 from split_data import split_data
+from app.config import MODEL_URI, MLFLOW_TRACKING_URI
 import mlflow
 
 class YOLOModelWrapper(mlflow.pyfunc.PythonModel):
@@ -16,17 +17,26 @@ experiment_name = "face_detector-local"
 os.chdir(BASE_DIR)  # ml 폴더에 학습 결과를 저장하기 위함
 
 # 환경변수와 MLflow에 절대 경로 URI 주입
-os.environ["MLFLOW_TRACKING_URI"] = "sqlite:///mlflow.db"
+os.environ["MLFLOW_TRACKING_URI"] = MLFLOW_TRACKING_URI
 os.environ["MLFLOW_EXPERIMENT_NAME"] = experiment_name
 settings.update({"mlflow": True})
 
-mlflow.set_tracking_uri("sqlite:///mlflow.db")
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 mlflow.set_experiment(experiment_name)
 
 # dataset: https://www.kaggle.com/datasets/lylmsc/wider-face-for-yolo-training
 split_data() # 데이터 준비
 
-model = YOLO("yolo26n.pt")
+try:
+    weight_path = mlflow.artifacts.download_artifacts(
+        artifact_uri=MODEL_URI+"/artifacts/last.pt"
+    )
+    print("INFO: LOADED last.pt")
+except:
+    weight_path = "yolo26n.pt"
+    print("INFO: LOADED yolo26n.pt")
+
+model = YOLO(weight_path)
 
 with mlflow.start_run() as run:
     results = model.train(
@@ -42,13 +52,22 @@ with mlflow.start_run() as run:
     )
 
     best_model_path = os.path.join(PROJECT_DIR, "face_detector", "weights", "best.pt")
+    last_model_path = os.path.join(PROJECT_DIR, "face_detector", "weights", "last.pt")
     print(f"Model saved to: {best_model_path}")
 
-    # 모델 저장
-    model_info = mlflow.pyfunc.log_model(
-        name="model",
+    # 모델 저장 (best & last)
+    best_model_info = mlflow.pyfunc.log_model(
+        name="best_model",
         python_model=YOLOModelWrapper(),
         artifacts={"best.pt": best_model_path},
+        registered_model_name='face-detector'
+    )
+
+    # 추후 이어서 학습하기 위해서 저장
+    last_model_info = mlflow.pyfunc.log_model(
+        name="last_model",
+        python_model=YOLOModelWrapper(),
+        artifact_path={"last.pt": last_model_path},
         registered_model_name='face-detector'
     )
 
