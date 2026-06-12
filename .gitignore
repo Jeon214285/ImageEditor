@@ -15,7 +15,7 @@ coverage/
 ml/data/raw_data/
 ml/data/images/
 ml/data/labels/
-ml/runs/
-ml/mlruns/
-ml/mlflow.db
-*.pt
+# ml/runs/
+# ml/mlruns/
+# ml/mlflow.db
+yolo26n.pt

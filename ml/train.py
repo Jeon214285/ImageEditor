@@ -1,8 +1,7 @@
 import os
-from pathlib import Path
+import pathlib
 from ultralytics import YOLO, settings
 from split_data import split_data
-from app.config import MODEL_URI, MLFLOW_TRACKING_URI
 import mlflow
 
 class YOLOModelWrapper(mlflow.pyfunc.PythonModel):
@@ -11,6 +10,7 @@ class YOLOModelWrapper(mlflow.pyfunc.PythonModel):
 BASE_DIR = os.path.dirname(__file__)
 YAML_PATH = os.path.join(BASE_DIR, "data.yaml")
 PROJECT_DIR = os.path.join(BASE_DIR, "runs") 
+MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
 
 experiment_name = "face_detector-local"
 
@@ -33,10 +33,10 @@ try:
     )
     is_resume = True
     print("INFO: LOADED last.pt")
-except:
+except Exception as e:
     weight_path = "yolo26n.pt"
     is_resume = False
-    print("INFO: LOADED yolo26n.pt")
+    print(f"INFO: LOADED yolo26n.pt | EXCEPTION={e}")
 
 model = YOLO(weight_path)
 
@@ -58,19 +58,14 @@ with mlflow.start_run() as run:
     last_model_path = os.path.join(PROJECT_DIR, "face_detector", "weights", "last.pt")
     print(f"Model saved to: {best_model_path}")
 
-    # 모델 저장 (best & last)
-    best_model_info = mlflow.pyfunc.log_model(
-        name="best_model",
-        python_model=YOLOModelWrapper(),
-        artifacts={"best.pt": best_model_path},
-        registered_model_name='face-detector'
-    )
+    best_model_uri = pathlib.Path(best_model_path).resolve().as_uri()
+    last_model_uri = pathlib.Path(last_model_path).resolve().as_uri()
 
-    # 추후 이어서 학습하기 위해서 저장
-    last_model_info = mlflow.pyfunc.log_model(
-        name="last_model",
+    # 모델 저장 (best & last)
+    model_info = mlflow.pyfunc.log_model(
+        name="face-detector",
         python_model=YOLOModelWrapper(),
-        artifact_path={"last.pt": last_model_path},
+        artifacts={"best.pt": best_model_uri, "last.pt": last_model_uri},
         registered_model_name='face-detector'
     )
 
