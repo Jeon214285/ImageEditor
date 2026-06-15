@@ -1,0 +1,27 @@
+artifact_path: "file:///C:/Users/214285/Desktop/\uB300\uD559/\uC218\uC5C5/4-1/\uC778\
+  \uACF5\uC9C0\uB2A5\uC18C\uD504\uD2B8\uC6E8\uC5B4\uAC1C\uBC1C\uBC0F\uD30C\uC774\uD504\
+  \uB77C\uC778/\uC2E4\uC2B5/ImageEditor/ml/mlruns/2/models/m-fb14a838928a416ca5387c8b49b8afde/artifacts"
+flavors:
+  python_function:
+    artifacts:
+      best.pt:
+        path: artifacts\best.pt
+        uri: file:///C:/Users/214285/Desktop/%EB%8C%80%ED%95%99/%EC%88%98%EC%97%85/4-1/%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%EA%B0%9C%EB%B0%9C%EB%B0%8F%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8/%EC%8B%A4%EC%8A%B5/ImageEditor/ml/runs/face_detector/weights/best.pt
+      last.pt:
+        path: artifacts\last.pt
+        uri: file:///C:/Users/214285/Desktop/%EB%8C%80%ED%95%99/%EC%88%98%EC%97%85/4-1/%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4%EA%B0%9C%EB%B0%9C%EB%B0%8F%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8/%EC%8B%A4%EC%8A%B5/ImageEditor/ml/runs/face_detector/weights/last.pt
+    cloudpickle_version: 3.1.2
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.11.0
+    streamable: false
+mlflow_version: 3.10.1
+model_id: m-fb14a838928a416ca5387c8b49b8afde
+model_size_bytes: 10792160
+model_uuid: m-fb14a838928a416ca5387c8b49b8afde
+prompts: null
+utc_time_created: '2026-06-15 07:42:56.700639'

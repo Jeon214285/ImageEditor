@@ -10,9 +10,10 @@ class YOLOModelWrapper(mlflow.pyfunc.PythonModel):
 BASE_DIR = os.path.dirname(__file__)
 YAML_PATH = os.path.join(BASE_DIR, "data.yaml")
 PROJECT_DIR = os.path.join(BASE_DIR, "runs") 
-MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+# MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+MLFLOW_TRACKING_URI = "https:/skinning-outburst-storm.ngrok-free.dev"
 
-experiment_name = "face_detector-local"
+experiment_name = "face_detector-server"
 
 os.chdir(BASE_DIR)  # ml 폴더에 학습 결과를 저장하기 위함
 
@@ -22,6 +23,7 @@ os.environ["MLFLOW_EXPERIMENT_NAME"] = experiment_name
 settings.update({"mlflow": True})
 
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_registry_uri(MLFLOW_TRACKING_URI)
 mlflow.set_experiment(experiment_name)
 
 # dataset: https://www.kaggle.com/datasets/lylmsc/wider-face-for-yolo-training
