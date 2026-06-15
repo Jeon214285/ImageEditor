@@ -19,3 +19,4 @@ ml/data/labels/
 # ml/mlruns/
 # ml/mlflow.db
 yolo26n.pt
+actions-runner/
