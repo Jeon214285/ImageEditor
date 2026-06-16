@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(__file__)
 YAML_PATH = os.path.join(BASE_DIR, "data.yaml")
 PROJECT_DIR = os.path.join(BASE_DIR, "runs") 
 # MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
-MLFLOW_TRACKING_URI = "https:/skinning-outburst-storm.ngrok-free.dev"
+MLFLOW_TRACKING_URI = "https://skinning-outburst-storm.ngrok-free.dev"
 
 experiment_name = "face_detector-server"
 
