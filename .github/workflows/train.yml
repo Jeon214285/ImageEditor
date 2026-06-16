@@ -27,7 +27,7 @@ jobs:
       - name: Run trainin
         working-directory: ./ml
         run: |
-          python -m ml.train
+          python -m train
 
       - name: Upload train result
         uses: actions/upload-artifact@v4
