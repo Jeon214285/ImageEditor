@@ -35,8 +35,7 @@ jobs:
           node-version: '18'
       
       - name: Start FastAPI server in background
-        run: uvicorn app.main:app --host 0.0.0.0 --port 8000 &
-        shell: bash
+        run: Start-Process -FilePath "uvicorn" -ArgumentList "app.main:app", "--host", "0.0.0.0", "--port", "8000" -NoNewWindow
 
       - name: Wait for server to be ready
         run: sleep 5
