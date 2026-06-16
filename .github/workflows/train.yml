@@ -13,23 +13,42 @@ jobs:
   train:
     runs-on: self-hosted
     steps:
-      - name: 코드 가져오기
+      - name: Checkout code
         uses: actions/checkout@v4
-      - name: 파이썬 설치
+
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: 라이브러리 설치
+
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-gpu.txt
-      - name: 테스트 실행
+          playwright install --with-deps
+          pip install pytest-cov==7.1.0
+          pip install hypothesis
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Start FastAPI server in background
+        run: uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+
+      - name: Wait for server to be ready
+        run: sleep 5
+
+      - name: Run Python tests
         run: |
           pytest -q
-      - name: 모델 학습
+
+      - name: Train Model
         run: |
           python -m ml.train
-      - name: 학습 결과 업로드
+
+      - name: Upload train result
         uses: actions/upload-artifact@v4
         with:
           name: trained-face-detector-model-files
