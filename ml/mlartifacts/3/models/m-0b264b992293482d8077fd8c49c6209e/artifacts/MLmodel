@@ -1,0 +1,26 @@
+artifact_path: mlflow-artifacts:/3/models/m-0b264b992293482d8077fd8c49c6209e/artifacts
+flavors:
+  python_function:
+    artifacts:
+      best.pt:
+        path: artifacts\best.pt
+        uri: file:///C:/actions-runner/_work/ImageEditor/ImageEditor/ml/runs/plate_detector/weights/best.pt
+      last.pt:
+        path: artifacts\last.pt
+        uri: file:///C:/actions-runner/_work/ImageEditor/ImageEditor/ml/runs/plate_detector/weights/last.pt
+    cloudpickle_version: 3.1.2
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.11.9
+    streamable: false
+mlflow_version: 3.10.1
+model_id: m-0b264b992293482d8077fd8c49c6209e
+model_size_bytes: 10735884
+model_uuid: m-0b264b992293482d8077fd8c49c6209e
+prompts: null
+run_id: b4ebf4dc06bc4615892e131f2e70fba9
+utc_time_created: '2026-06-17 10:16:14.972006'
