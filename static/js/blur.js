@@ -61,3 +61,69 @@ export function imageBlur() {
         alert("이미지를 흐리게 하는 중 오류가 발생했습니다.")
     }
 }
+
+export function allBlur() {
+    const faces = state.detectFaces || [];
+    const plates = state.detectPlates || [];
+    const allObjects = [...faces, ...plates];
+
+    if (allObjects.length === 0) {
+        alert("탐지된 얼굴 또는 번호판이 없습니다. 먼저 탐지를 실행해주세요.");
+        return;
+    }
+
+    try {
+        state.context.putImageData(state.cleanImageData, 0, 0);
+
+        if (state.blurPx > 0) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = state.canvas.width;
+             tempCanvas.height = state.canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            tempCtx.putImageData(state.cleanImageData, 0, 0);
+
+            state.context.save();
+            state.context.beginPath();
+            
+            allObjects.forEach(obj => {
+                state.context.rect(obj.x, obj.y, obj.w, obj.h);
+            });
+
+            state.context.clip()
+
+            state.context.filter = 'blur(' + state.blurPx + 'px)';
+            state.context.drawImage(tempCanvas, 0, 0);
+
+            state.context.restore();
+        }
+
+        state.cleanImageData = state.context.getImageData(0, 0, state.canvas.width, state.canvas.height);
+
+        state.detectFaces = null;
+        state.detectPlates = null;
+
+        fetch('/api/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                level: 'INFO',
+                action: 'ALL_BLUR_SUCCESS',
+                details: `TOTAL_OBJECTS=${allObjects.length} (FACES=${faces.length}, PLATES=${plates.length}) | BLURPX=${state.blurPx}`
+            })
+        }).catch(err => console.error("로그 전송 실패", err));
+
+    } catch(error) {
+        fetch('/api/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                level: 'ERROR',
+                action: 'ALL_BLUR_ERROR',
+                details: `TOTAL_OBJECTS=${allObjects.length} | BLURPX=${state.blurPx} | ERROR: ${error.message}`
+            })
+        }).catch(err => console.error("에러 로그 전송 실패", err));
+        
+        alert("탐지된 객체를 흐리게 하는 중 오류가 발생했습니다.");
+    }
+}

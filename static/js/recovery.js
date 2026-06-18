@@ -14,6 +14,12 @@ export function imageRecovery(){
 
         setCropCoordinates(null);
         state.cleanImageData = state.originalImageData;
+        
+        state.faceSetConf = null;
+        state.plateSetConf = null;
+
+        state.detectFaces = null;
+        state.detectPlates = null;
 
         fetch('/api/log', {
             method: 'POST',

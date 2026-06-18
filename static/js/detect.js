@@ -27,7 +27,14 @@ export async function faceDetect() {
 
     const faceDetectBtn = document.getElementById('faceDetectBtn');
 
-    state.context.putImageData(state.cleanImageData, 0, 0);  // 드래그 지우고 실행
+    // 설정 conf 저장
+    state.faceSetConf = state.conf;
+
+    if (state.detectFaces === null && state.detectPlates === null) {
+        state.context.putImageData(state.cleanImageData, 0, 0);  // 드래그 지우고 실행
+    }
+
+    state.detectFaces = null;
 
     // 커서 로딩 상태로 변경
     document.body.style.cursor = "wait";
@@ -142,7 +149,14 @@ export async function plateDetect() {
 
     const plateDetectBtn = document.getElementById('plateDetectBtn');
 
-    state.context.putImageData(state.cleanImageData, 0, 0);  // 드래그 지우고 실행
+    // 설정 conf 저장
+    state.plateSetConf = state.conf;
+
+    if (state.detectFaces === null && state.detectPlates === null) {
+        state.context.putImageData(state.cleanImageData, 0, 0);  // 드래그 지우고 실행
+    }
+
+    state.detectPlates = null;
 
     // 커서 로딩 상태로 변경
     document.body.style.cursor = "wait";
