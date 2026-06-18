@@ -32,7 +32,7 @@ for info in model_info:
     # 환경변수와 MLflow에 절대 경로 URI 주입
     os.environ["MLFLOW_TRACKING_URI"] = MLFLOW_TRACKING_URI
     os.environ["MLFLOW_EXPERIMENT_NAME"] = experiment_name
-    settings.update({"mlflow": True})
+    settings.update({"mlflow": False})  # YOLO 내부에서 run을 강제 종료하는 것을 방지
 
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_registry_uri(MLFLOW_TRACKING_URI)
@@ -40,8 +40,6 @@ for info in model_info:
 
     # dataset: https://www.kaggle.com/datasets/lylmsc/wider-face-for-yolo-training
     #          https://www.kaggle.com/datasets/fareselmenshawii/license-plate-dataset
-
-
     try:
         weight_path = mlflow.artifacts.download_artifacts(
             artifact_uri=info['artifact_uri']
@@ -69,6 +67,16 @@ for info in model_info:
             workers=0
         )
 
+        # 학습 기록 저장
+        if hasattr(results, 'results_dict'):
+            sanitized_metrics = {}
+            for key, value in results.results_dict.items():
+                # 괄호 '(' 를 '_'로 바꾸고, ')'는 없애기
+                safe_key = key.replace('(', '_').replace(')', '')
+                sanitized_metrics[safe_key] = value
+            mlflow.log_metrics(sanitized_metrics)
+            print("INFO: MLflow에 지표(Metrics) 기록 완료")
+            
         best_model_path = os.path.join(PROJECT_DIR, info['model_path'], "weights", "best.pt")
         last_model_path = os.path.join(PROJECT_DIR, info['model_path'], "weights", "last.pt")
         print(f"Model saved to: {best_model_path}")
