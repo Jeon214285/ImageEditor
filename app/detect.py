@@ -1,5 +1,5 @@
 from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, Response
+from fastapi import APIRouter, UploadFile, File, Response, Form
 from fastapi.responses import JSONResponse
 import cv2
 import numpy as np
@@ -14,7 +14,7 @@ router = APIRouter()
 
 try:
     face_model = load_face_model()
-    logger.info("PLATE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE MODEL FROM MLFLOW")
+    logger.info("FACE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE MODEL FROM MLFLOW")
 except Exception as e:
     face_model = YOLO('yolo26n.pt')  # 모델이 없으면 기본모델(CI/CD 대비)
     logger.warning(f"FACE_MODEL_LOAD_FAILED | EXCEPTION={e} | LOADED DEFAULT YOLO MODEL")
@@ -29,7 +29,8 @@ except Exception as e:
 # 사람 얼굴 탐지
 @router.post("/api/detect/face")
 async def process_face_detect(
-    image: UploadFile = File(...)
+    image: UploadFile = File(...),
+    conf: float = Form(0.80)
 ):
     api_start_time = time.time()
 
@@ -48,8 +49,7 @@ async def process_face_detect(
         algo_start_time = time.time()
 
         # 모델 추론
-        # results = model.predict(source=img, imgsz=640, conf=0.5, verbose=False)
-        results = face_model([img])
+        results = face_model.predict(source=[img], end2end=False, conf=conf)
 
         # 탐지된 객체 정보 추출
         faces_count = 0
@@ -79,7 +79,8 @@ async def process_face_detect(
 # 차량 번호판 탐지    
 @router.post("/api/detect/plate")
 async def process_plate_detect(
-    image: UploadFile = File(...)
+    image: UploadFile = File(...),
+    conf: float = Form(0.80)
 ):
     api_start_time = time.time()
 
@@ -98,8 +99,7 @@ async def process_plate_detect(
         algo_start_time = time.time()
 
         # 모델 추론
-        # results = model.predict(source=img, imgsz=640, conf=0.5, verbose=False)
-        results = plate_model([img])
+        results = plate_model.predict(source=[img], end2end=False, conf=conf)
 
         # 탐지된 객체 정보 추출
         plates_count = 0

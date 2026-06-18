@@ -1,5 +1,9 @@
 import { state } from './state.js';
 
+export function controlConf() {
+    state.conf = parseFloat(document.getElementById("conf").value, 10);
+}
+
 function drawDetectedObjects(objects, color) {
     // 기존 상태 백업
     state.context.save();
@@ -50,7 +54,7 @@ export async function faceDetect() {
 
         const formData = new FormData();
         formData.append('image', blob, 'current_image.png')
-        formData.append('target', 'face');
+        formData.append('conf', state.conf)
 
         const startTime = performance.now()
 
@@ -165,7 +169,7 @@ export async function plateDetect() {
 
         const formData = new FormData();
         formData.append('image', blob, 'current_image.png')
-        formData.append('target', 'plate');
+        formData.append('conf', state.conf)
 
         const startTime = performance.now()
 

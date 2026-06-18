@@ -12,6 +12,7 @@ export const state = {
     startY: 0,
 
     blurPx: 50,
+    conf: 0.80,
 
     faceDetect: null,
     plateDetect: null,
