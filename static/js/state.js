@@ -14,6 +14,7 @@ export const state = {
     blurPx: 50,
 
     faceDetect: null,
+    plateDetect: null,
 };
 
 window.state = state;

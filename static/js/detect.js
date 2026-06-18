@@ -50,11 +50,12 @@ export async function faceDetect() {
 
         const formData = new FormData();
         formData.append('image', blob, 'current_image.png')
+        formData.append('target', 'face');
 
         const startTime = performance.now()
 
         try { 
-            const response = await fetch('/api/detect', {
+            const response = await fetch('/api/detect/face', {
                 method: 'POST',
                 body: formData
             });
@@ -98,7 +99,7 @@ export async function faceDetect() {
             
             // 로그 출력 포매팅 (여러개 일 수 있기 때문)
             const faceDetails = faces.map((f, index) => 
-                `[${index + 1}] COOR=(${f.x}, ${f.y}) AREA=${f.width}x${f.height}px`
+                `[${index + 1}] COOR=(${f.x}, ${f.y}) AREA=${f.w}x${f.h}px`
             ).join(' | ');
 
 
@@ -128,6 +129,122 @@ export async function faceDetect() {
              document.body.style.cursor = 'default';
             state.canvas.style.cursor = 'default';
             if (faceDetectBtn) faceDetectBtn.disabled = false;
+        }
+    })
+}
+
+export async function plateDetect() {
+    if (document.body.style.cursor === "wait") return;
+
+    const plateDetectBtn = document.getElementById('plateDetectBtn');
+
+    state.context.putImageData(state.cleanImageData, 0, 0);  // 드래그 지우고 실행
+
+    // 커서 로딩 상태로 변경
+    document.body.style.cursor = "wait";
+    state.canvas.style.cursor = "wait";
+    if (plateDetectBtn) plateDetectBtn.disabled = true;
+
+    state.canvas.toBlob(async (blob) => {
+        if (!blob) {
+            document.body.style.cursor = 'default';
+            state.canvas.style.cursor = 'default';
+            if (plateDetectBtn) plateDetectBtn.disabled = false;
+
+        fetch('/api/log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    level: 'ERROR',
+                    action: 'PLATE_DETECT_BLOB_ERROR',
+                    details: `ERROR=Blob 변환 실패`
+                })
+            }).catch(err => console.error("에러 로그 전송 실패", err));
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', blob, 'current_image.png')
+        formData.append('target', 'plate');
+
+        const startTime = performance.now()
+
+        try { 
+            const response = await fetch('/api/detect/plate', {
+                method: 'POST',
+                body: formData
+            });
+
+            const duration = Math.round(performance.now() - startTime);
+        
+            // 에러 발생 시
+            if (!response.ok) {
+                // 에러 로그
+                fetch('/api/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        level: 'ERROR',
+                        action: 'PLATE_DETECT_API_ERROR',
+                        details: `ERROR=API ERROR ${response.status}`
+                    })
+                }).catch(err => console.error("에러 로그 전송 실패", err));
+
+                if (response.status === 415) {
+                    alert("유효하지 않은 이미지입니다.");
+                } else if (response.status === 500) {
+                    alert("서버 내부 오류가 발생했습니다.");
+                } else {
+                    alert(`알 수 없는 오류 발생: ${response.status}`);
+                }
+                return;
+            }
+
+            // 받아온 번호판 좌표 정보를 저장하는 부분
+            const result = await response.json();
+            console.log("백엔드에서 받은 원본 데이터:", result);
+            const plates = result.plates;
+            const count = result.count;
+            
+            state.detectPlates = plates;
+            
+            // 탐지된 그림이 있으면 그리기
+            if (count > 0) {
+               drawDetectedObjects(plates, '#0000FF');
+            }
+            
+            // 로그 출력 포매팅 (여러개 일 수 있기 때문)
+            const plateDetails = plates.map((f, index) => 
+                `[${index + 1}] COOR=(${f.x}, ${f.y}) AREA=${f.w}x${f.h}px`
+            ).join(' | ');
+
+
+            fetch('/api/log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    level: 'INFO',
+                    action: 'PLATE_DETECTOR_SUCCESS',
+                    // 탐지한 번호판 개수 정보 출력(개수, 좌표, 크기)
+                    details: `PLATES=${count} | ${plateDetails} | TIME=${duration}ms`
+                })
+            }).catch(err => console.error("에러 로그 전송 실패", err));
+
+        } catch(error) {
+            const duration = Math.round(performance.now() - startTime);
+            fetch('/api/log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    level: 'ERROR',
+                    action: 'PLATE_DETECT_ERROR',
+                    details: `ERROR=${error.message}`
+                })
+            }).catch(err => console.error("에러 로그 전송 실패", err));
+        } finally {
+             document.body.style.cursor = 'default';
+            state.canvas.style.cursor = 'default';
+            if (plateDetectBtn) plateDetectBtn.disabled = false;
         }
     })
 }
