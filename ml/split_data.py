@@ -3,7 +3,7 @@ import random
 from pathlib import Path
 
 # BASE_DIR = Path(__file__).parent
-BASE_DIR = "C:/Users/214285/Desktop/ImageEditor/ml"
+BASE_DIR = Path("C:/Users/214285/Desktop/ImageEditor/ml")
 RAW_DIR = BASE_DIR / "data" / "raw_data"
 SPLIT_DIR = BASE_DIR / "data"
 
