@@ -17,6 +17,9 @@ def test_page():
     assert 'id="blurPx"' in response.text
     assert "원래대로" in response.text
     assert "얼굴 탐지" in response.text
+    assert "차량 번호판 탐지" in response.text
+    assert 'id="conf"' in response.text
+    assert "모두 흐리게" in response.text
 
 def test_favicon():
     response = client.get("/favicon.ico")
@@ -39,18 +42,29 @@ def test_detect_api():
     test_image_path = "tests/test.png"
 
     with open(test_image_path, "rb") as image_file:
-        response = client.post(
-            "/api/detect",
-            files={"image": ("test.png", image_file, "image/png")},
+        face_response = client.post(
+            "/api/detect/face",
+            files={"image": ("test.png", image_file, "image/png")}
         )
 
-    assert response.status_code == 200
-    response_data = response.json()
+        plate_response = client.post(
+            "/api/detect/plate",
+            files={"image": ("test.png", image_file, "image/png")}
+        )
 
-    assert isinstance(response_data, dict)  # json 형식으로 반환하는지 확인
+    assert face_response.status_code == 200
+    assert plate_response.status_code == 200
+    face_response_data = face_response.json()
+    plate_response_data = plate_response.json()
 
-    assert "count" in response_data
-    assert "faces" in response_data
+    assert isinstance(face_response_data, dict)  # json 형식으로 반환하는지 확인
+    assert isinstance(plate_response_data, dict)  # json 형식으로 반환하는지 확인
+
+    assert "count" in face_response_data
+    assert "faces" in face_response_data
+    assert "count" in plate_response_data
+    assert "plates" in plate_response_data
     
-    assert isinstance(response_data["faces"], list)
+    assert isinstance(face_response_data["faces"], list)
+    assert isinstance(plate_response_data["plates"], list)
     # assert len(result) > 0  # 얼굴이 없을 수 있으므로 테스트 X

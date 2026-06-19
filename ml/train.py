@@ -1,8 +1,10 @@
 import os
 import pathlib
+import mlflow
+from mlflow.tracking import MlflowClient
 from ultralytics import YOLO, settings
 from split_data import split_data
-import mlflow
+from model_promoter import promote_if_better
 
 class YOLOModelWrapper(mlflow.pyfunc.PythonModel):
     pass
@@ -24,15 +26,20 @@ model_info.append({'model_name': 'plate-detector', 'experiment_name': 'plate_det
 
 split_data() # 데이터 준비
 
-for info in model_info:
-    experiment_name = info['experiment_name']
+os.chdir(BASE_DIR)  # ml 폴더에 학습 결과를 저장하기 위함
 
-    os.chdir(BASE_DIR)  # ml 폴더에 학습 결과를 저장하기 위함
+client = MlflowClient()
+
+for info in model_info:
+    best_map = -1.0
+    best_version = None
+    new_map = -1.0
+    experiment_name = info['experiment_name']
 
     # 환경변수와 MLflow에 절대 경로 URI 주입
     os.environ["MLFLOW_TRACKING_URI"] = MLFLOW_TRACKING_URI
     os.environ["MLFLOW_EXPERIMENT_NAME"] = experiment_name
-    settings.update({"mlflow": True})
+    settings.update({"mlflow": False})  # YOLO 내부에서 run을 강제 종료하는 것을 방지
 
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_registry_uri(MLFLOW_TRACKING_URI)
@@ -40,8 +47,6 @@ for info in model_info:
 
     # dataset: https://www.kaggle.com/datasets/lylmsc/wider-face-for-yolo-training
     #          https://www.kaggle.com/datasets/fareselmenshawii/license-plate-dataset
-
-
     try:
         weight_path = mlflow.artifacts.download_artifacts(
             artifact_uri=info['artifact_uri']
@@ -69,6 +74,17 @@ for info in model_info:
             workers=0
         )
 
+        # 학습 기록 저장
+        if hasattr(results, 'results_dict'):
+            sanitized_metrics = {}
+            for key, value in results.results_dict.items():
+                # 괄호 '(' 를 '_'로 바꾸고, ')'는 없애기
+                safe_key = key.replace('(', '_').replace(')', '')
+                sanitized_metrics[safe_key] = value
+            new_map = sanitized_metrics.get('metrics/mAP50-95_B', -1.0)
+            mlflow.log_metrics(sanitized_metrics)
+            print("INFO: MLflow에 지표(Metrics) 기록 완료")
+            
         best_model_path = os.path.join(PROJECT_DIR, info['model_path'], "weights", "best.pt")
         last_model_path = os.path.join(PROJECT_DIR, info['model_path'], "weights", "last.pt")
         print(f"Model saved to: {best_model_path}")
@@ -83,5 +99,21 @@ for info in model_info:
             artifacts={"best.pt": best_model_uri, "last.pt": last_model_uri},
             registered_model_name=info['model_name']
         )
+
+        latest_versions = client.search_model_versions(f"name='{info['model_name']}'")
+        latest_version = max(latest_versions, key=lambda v: int(v.version)).version
+
+        client.set_registered_model_alias(
+            name=info['model_name'],
+            alias='challenger',
+            version=str(latest_version)
+        )
+
+        if new_map > best_map:
+            best_map = new_map
+            best_version = latest_version
+
+        if best_version is not None:
+            promote_if_better(best_version, best_map, model_name=info['model_name'])
 
         # mlflow.log_artifact(best_model_path, artifact_path="weights")  # artifact 저장  # 중복 저장을 방지하여 사용X

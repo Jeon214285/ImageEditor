@@ -23,9 +23,19 @@ def test_hypothesis_fuzzing_grabcut(raw_bytes):
     assert response.text == "유효하지 않은 이미지입니다."
 
 @given(st.binary(min_size=1, max_size=50000))
-def test_hypothesis_fuzzing_detect(raw_bytes):
+def test_hypothesis_fuzzing_face_detect(raw_bytes):
     response = client.post(
-        "/api/detect",
+        "/api/detect/face",
+        files={"image": ("fuzz_test.png", raw_bytes, "image/png")}
+    )
+
+    assert response.status_code == 415
+    assert response.text == "유효하지 않은 이미지입니다."
+
+@given(st.binary(min_size=1, max_size=50000))
+def test_hypothesis_fuzzing_plate_detect(raw_bytes):
+    response = client.post(
+        "/api/detect/plate",
         files={"image": ("fuzz_test.png", raw_bytes, "image/png")}
     )
 

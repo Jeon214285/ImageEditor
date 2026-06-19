@@ -12,8 +12,13 @@ export const state = {
     startY: 0,
 
     blurPx: 50,
+    conf: 0.80,
+    faceSetConf: null,
+    plateSetConf: null,
+    minConf: 1.00,
 
-    faceDetect: null,
+    detectFaces: null,
+    detectPlates: null,
 };
 
 window.state = state;
