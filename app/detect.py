@@ -1,4 +1,3 @@
-from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, Response, Form
 from fastapi.responses import JSONResponse
 import cv2
@@ -6,22 +5,36 @@ import numpy as np
 import logging
 import time
 from ultralytics import YOLO
-from app.model_loader import load_face_model, load_plate_model
+from app.model_loader import (
+    load_face_champion_model, load_face_challenger_model,
+    load_plate_champion_model, load_plate_challenger_model,
+    select_serving_model
+)
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+serving_model = select_serving_model()
+
 try:
-    face_model = load_face_model()
-    logger.info("FACE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE MODEL FROM MLFLOW")
+    if serving_model == "challenger":
+        face_model = load_face_challenger_model()
+        logger.info("FACE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE CHALLENGER MODEL FROM MLFLOW")
+    else: 
+        face_model = load_face_champion_model()
+        logger.info("FACE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE CHAMPION MODEL FROM MLFLOW")
 except Exception as e:
     face_model = YOLO('yolo26n.pt')  # 모델이 없으면 기본모델(CI/CD 대비)
     logger.warning(f"FACE_MODEL_LOAD_FAILED | EXCEPTION={e} | LOADED DEFAULT YOLO MODEL")
 
 try:
-    plate_model = load_plate_model()
-    logger.info("PLATE_MODEL_LOAD_SUCCESS | LOADED YOLO PLATE MODEL FROM MLFLOW")
+    if serving_model == "challenger":
+        plate_model = load_plate_challenger_model()
+        logger.info("PLATE_MODEL_LOAD_SUCCESS | LOADED YOLO PLATE CHALLENGER MODEL FROM MLFLOW")
+    else:
+        plate_model = load_plate_champion_model()
+        logger.info("PLATE_MODEL_LOAD_SUCCESS | LOADED YOLO PLATE CHAMPION MODEL FROM MLFLOW")
 except Exception as e:
     plate_model = YOLO('yolo26n.pt')  # 모델이 없으면 기본모델(CI/CD 대비)
     logger.warning(f"PLATE_MODEL_LOAD_FAILED | EXCEPTION={e} | LOADED DEFAULT YOLO MODEL")

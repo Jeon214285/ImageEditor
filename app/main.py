@@ -1,20 +1,21 @@
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from app.grabcut import router as grabcut_router
-from app.detect import router as detect_router
 import logging
-from pydantic import BaseModel
-from app.issue import *
-from app.config import LOW_CONFIDENCE_THRESHOLD
-from app.retrain_issue import update_issue_state
 
-# 로그 포맷
+# 로그 포맷(모델 로드 시 로그 출력을 위해 import 전 설정)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(filename)s:%(lineno)d (%(funcName)s) | %(message)s"
 )
 logger = logging.getLogger()
+
+from app.grabcut import router as grabcut_router
+from app.detect import router as detect_router
+from pydantic import BaseModel
+from app.issue import *
+from app.config import LOW_CONFIDENCE_THRESHOLD
+from app.retrain_issue import update_issue_state
 
 github_handler = GitHubIssueHandler()
 github_handler.setLevel(logging.ERROR)  # ERROR 이상만 보냄
