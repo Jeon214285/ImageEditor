@@ -19,3 +19,4 @@ ml/data/
 yolo26n.pt
 actions-runner/
 google_key.json
+.env

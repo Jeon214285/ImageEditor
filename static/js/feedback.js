@@ -50,7 +50,7 @@ export function sendPlateFeedback(reason) {
     })
     .then(response => {
         if (response.ok) {
-            alert(`피드백전송이 완료되었습니다.`);
+            alert(`피드백 전송이 완료되었습니다.`);
             console.log("피드백 전송 성공");
         } else {
             alert(`피드백 전송 실패 (상태 코드: ${response.status})`);

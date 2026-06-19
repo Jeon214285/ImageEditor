@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from unittest.mock import patch
 
 client = TestClient(app)
 
@@ -20,6 +21,12 @@ def test_page():
     assert "차량 번호판 탐지" in response.text
     assert 'id="conf"' in response.text
     assert "모두 흐리게" in response.text
+    assert "못 찾은 얼굴이 있음" in response.text
+    assert "얼굴이 아닌 곳을 가리킴" in response.text
+    assert "얼굴 위치가 안 맞음" in response.text
+    assert "못 찾은 번호판이 있음" in response.text
+    assert "번호판이 아닌 곳을 가리킴" in response.text
+    assert "번호판 위치가 안 맞음" in response.text
 
 def test_favicon():
     response = client.get("/favicon.ico")
@@ -38,7 +45,10 @@ def test_grabcut_api():
     assert response.status_code == 200
     assert len(response.content) > 0
 
-def test_detect_api():
+@patch("app.main.append_prediction_log")
+def test_detect_api(mock_append_log):
+    _ = mock_append_log  # VSCODE상 어둡게 하는 것을 방지
+    
     test_image_path = "tests/test.png"
 
     with open(test_image_path, "rb") as image_file:
