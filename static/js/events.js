@@ -2,10 +2,11 @@ import { state, setCropCoordinates } from './state.js';
 
 // 마우스를 누를 때
 function mouseDown(e) {
+    state.detectFaces = null;
+    state.detectPlates = null;
+
     if (!state.cleanImageData) {
         // 탐지 결과 삭제
-        state.detectFaces = null;
-        state.detectPlates = null;
         state.cleanImageData = state.context.getImageData(0, 0, state.canvas.width, state.canvas.height);
     }
 

@@ -27,8 +27,9 @@ export async function faceDetect() {
 
     const faceDetectBtn = document.getElementById('faceDetectBtn');
 
-    // 설정 conf 저장
-    state.faceSetConf = state.conf;
+    state.faceSetConf = state.conf; // 설정 conf 저장
+
+    setCropCoordinates(null); // 그래그 초기화
 
     if (state.detectFaces === null && state.detectPlates === null) {
         state.context.putImageData(state.cleanImageData, 0, 0);  // 드래그 지우고 실행

@@ -20,6 +20,14 @@ def test_drag(page: Page):
     box = canvas.bounding_box()
     assert box is not None
 
+    # 임의의 탐지 결과가 있다고 가정
+    page.evaluate("""
+        if (window.state) {
+            window.state.detectFaces = [{x: 10, y: 10, w: 50, h: 50}];
+            window.state.detectPlates = [{x: 20, y: 20, w: 60, h: 30}];
+        }
+    """)
+
     # 임의의 박스 드래그
     page.mouse.move(box['x'] + 50, box['y'] + 50)
     page.mouse.down()
@@ -28,11 +36,18 @@ def test_drag(page: Page):
 
     coords = page.evaluate("cropCoordinates")
 
+    detect_faces = page.evaluate("window.state ? window.state.detectFaces : undefined")
+    detect_plates = page.evaluate("window.state ? window.state.detectPlates : undefined")
+
     assert coords is not None
     assert coords["startX"] == 50
     assert coords["startY"] == 50
     assert coords["width"] == 150
     assert coords["height"] == 100
+
+    # 드래그 시 탐지 결과가 정상적으로 초기화되는지 확인
+    assert detect_faces is None
+    assert detect_plates is None
 
     # 두 번째 박스 드래그
     page.mouse.move(box['x'] + 100, box['y'] + 50)
