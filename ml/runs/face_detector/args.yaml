@@ -1,8 +1,8 @@
 task: detect
 mode: train
-model: C:\Users\214285\AppData\Local\Temp\tmpdb24bck1\artifacts/last.pt
+model: C:\Users\214285\AppData\Local\Temp\tmpz48bwa6h\artifacts/last.pt
 data: C:\Users\214285\Desktop\ImageEditor\ml\face_data.yaml
-epochs: 5
+epochs: 1
 time: null
 patience: 100
 batch: 16

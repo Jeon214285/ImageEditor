@@ -1,5 +1,6 @@
 import os
 import pathlib
+import time
 import mlflow
 from mlflow.tracking import MlflowClient
 from ultralytics import YOLO, settings
@@ -99,6 +100,8 @@ for info in model_info:
             artifacts={"best.pt": best_model_uri, "last.pt": last_model_uri},
             registered_model_name=info['model_name']
         )
+
+        time.sleep(10)  # 10초 대기
 
         latest_version = int(logged_model.registered_model_version)
 
