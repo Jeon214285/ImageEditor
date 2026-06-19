@@ -100,7 +100,7 @@ for info in model_info:
             registered_model_name=info['model_name']
         )
 
-        latest_version = logged_model.registered_model_version
+        latest_version = int(logged_model.registered_model_version)
 
         client.set_registered_model_alias(
             name=info['model_name'],
