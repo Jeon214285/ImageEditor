@@ -21,16 +21,14 @@ export function imageDownload() {
 
         const faceConfs = (state.faceSetConf === null) ? 1.00 : state.faceSetConf;
         const plateConfs = (state.plateSetConf === null) ? 1.00 : state.plateSetConf;
-        if (faceConfs < plateConfs){
-            state.minConf = faceConfs;
-        } else {
-            state.minConf = plateConfs
-        }
+        state.minConf = Math.min(faceConfs, plateConfs);
+
+        const modelType = (state.modelType === null) ? "None" : state.modelType;
 
         fetch('/api/monitor/drift', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({score: state.minConf})
+            body: JSON.stringify({score: state.minConf, modelType: modelType})
         }).catch(err => console.error("Drift 모니터링 전송 실패", err));
 
         const link = document.createElement('a');

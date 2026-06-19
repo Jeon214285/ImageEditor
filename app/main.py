@@ -23,6 +23,7 @@ logger.addHandler(github_handler)
 
 class DriftPayload(BaseModel):
     score: float
+    modelType: str
 
 class LogData(BaseModel):
     level: str = 'INFO'  # 기본값 INFO
@@ -58,7 +59,7 @@ async def monitor_drift(
     payload: DriftPayload,
     background_tasks: BackgroundTasks  # 응답 지연 방지용
 ):
-    background_tasks.add_task(update_issue_state, payload.score, LOW_CONFIDENCE_THRESHOLD)
+    background_tasks.add_task(update_issue_state, payload.score, LOW_CONFIDENCE_THRESHOLD, payload.modelType)
 
     return {"status": "success"}
 

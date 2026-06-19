@@ -16,6 +16,7 @@ export const state = {
     faceSetConf: null,
     plateSetConf: null,
     minConf: 1.00,
+    modelType: null,
 
     detectFaces: null,
     detectPlates: null,

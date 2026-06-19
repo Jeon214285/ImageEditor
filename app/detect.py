@@ -82,7 +82,8 @@ async def process_face_detect(
         # 탐지된 얼굴 개수 + 정보 로그에 출력
         logger.info(f"FACE_DETECT_SUCCESS | FACES={faces_count} | ALGOTIME={algo_duration:.0f}ms | TOTALTIME={total_duration:.0f}ms")
 
-        return JSONResponse(content={"faces": detected_faces, "count": len(detected_faces)})
+        return JSONResponse(content={"faces": detected_faces, "count": len(detected_faces),
+                                     "version": serving_model})
     
     except Exception as e:
         logger.error(f"FACE_DETECT_SERVER_ERROR | ERROR={str(e)}")
@@ -132,7 +133,8 @@ async def process_plate_detect(
         # 탐지된 얼굴 개수 + 정보 로그에 출력
         logger.info(f"PLATE_DETECT_SUCCESS | PLATES={plates_count} | ALGOTIME={algo_duration:.0f}ms | TOTALTIME={total_duration:.0f}ms")
 
-        return JSONResponse(content={"plates": detected_plates, "count": len(detected_plates)})
+        return JSONResponse(content={"plates": detected_plates, "count": len(detected_plates),
+                                     "version": serving_model})
     
     except Exception as e:
         logger.error(f"PLATE_DETECT_SERVER_ERROR | ERROR={str(e)}")
