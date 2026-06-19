@@ -16,6 +16,10 @@ from pydantic import BaseModel
 from app.issue import *
 from app.config import LOW_CONFIDENCE_THRESHOLD
 from app.retrain_issue import update_issue_state
+from app.google_sheet_logger import append_prediction_log, append_feedback_log
+from dotenv import load_dotenv
+
+load_dotenv()
 
 github_handler = GitHubIssueHandler()
 github_handler.setLevel(logging.ERROR)  # ERROR 이상만 보냄
@@ -29,6 +33,13 @@ class LogData(BaseModel):
     level: str = 'INFO'  # 기본값 INFO
     action: str  # 예: "UPLOAD", "CROP", "GRABCUT"
     details: str # 예: "이미지 크기 1024x768"
+
+class FeedbackRequest(BaseModel):
+    pred_class: str
+    coordinate: list = []
+    score: list = []
+    reason: str
+    serving_model: str = "None"
 
 # Fast 기반 웹 생성
 app = FastAPI(title="ImageEditor")
@@ -81,5 +92,23 @@ async def collect_log(data: LogData):
         logger.info(log_message)
 
     return {'status': 'success'}
+
+@app.post("/feedback")
+async def feedback(payload: FeedbackRequest):
+    try:
+        append_feedback_log(
+            payload.pred_class,
+            payload.coordinate,
+            payload.score,
+            payload.reason,
+            payload.serving_model
+        )
+        logger.info(
+            f"OK /feedback | class={payload.pred_class}"
+        )
+        return {'status': 'feedback saved'}
+    except Exception as e:
+        logger.exception(f"FAIL /feedback | error={type(e).__name__}: {e}")
+        return {'status': 'feedback save failed'}
 
 # uvicorn app.main:app --reload

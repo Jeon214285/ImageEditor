@@ -20,6 +20,9 @@ export const state = {
 
     detectFaces: null,
     detectPlates: null,
+    
+    faceScores: null,
+    plateScores: null,
 };
 
 window.state = state;

@@ -8,6 +8,7 @@ import { imageRecovery } from './recovery.js';
 import { backgroundRemoval } from './grabcut.js';
 import { controlBlur, imageBlur, allBlur } from './blur.js';
 import { controlConf, faceDetect, plateDetect } from './detect.js';
+import { sendFaceFeedback, sendPlateFeedback } from './feedback.js';
 
 // DOM 요소들을 State에 등록
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,3 +33,5 @@ window.controlBlur = controlBlur;
 window.controlConf = controlConf;
 window.faceDetect = faceDetect;
 window.plateDetect = plateDetect;
+window.sendFaceFeedback = sendFaceFeedback;
+window.sendPlateFeedback = sendPlateFeedback;
