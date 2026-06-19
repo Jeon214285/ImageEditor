@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 from app.main import app
-from unittest.mock import patch
 
 client = TestClient(app)
 
@@ -45,10 +44,7 @@ def test_grabcut_api():
     assert response.status_code == 200
     assert len(response.content) > 0
 
-@patch("app.main.append_prediction_log")
-def test_detect_api(mock_append_log):
-    _ = mock_append_log  # VSCODE상 어둡게 하는 것을 방지
-    
+def test_detect_api():
     test_image_path = "tests/test.png"
 
     with open(test_image_path, "rb") as image_file:
