@@ -15,6 +15,7 @@ export function imageRecovery(){
         setCropCoordinates(null);
         state.cleanImageData = state.originalImageData;
         
+        // 저장했던 conf 값 초기화
         state.faceSetConf = null;
         state.plateSetConf = null;
 

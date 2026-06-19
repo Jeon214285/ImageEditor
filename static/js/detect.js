@@ -1,4 +1,4 @@
-import { state } from './state.js';
+import { state, setCropCoordinates } from './state.js';
 
 export function controlConf() {
     state.conf = parseFloat(document.getElementById("conf").value, 10);
