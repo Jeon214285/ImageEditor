@@ -101,7 +101,8 @@ for info in model_info:
             registered_model_name=info['model_name']
         )
 
-        time.sleep(10)  # 10초 대기
+        print(f"Wait 60 seconds")
+        time.sleep(60)  # 60초 대기
 
         latest_version = int(logged_model.registered_model_version)
 
