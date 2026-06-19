@@ -20,7 +20,7 @@
     <br>
     <!-- 이미지 자르기 버튼 -->
     <button onclick="imageCut()">자르기</button>
-    <button id="grabcutBtn", onclick="backgroundRemoval()">배경 제거</button>
+    <button id="grabcutBtn" onclick="backgroundRemoval()">배경 제거</button>
     <button onclick="imageBlur()">흐리게</button>
     <input type="range" id="blurPx" min="0" max="100" value="50"
     onchange="controlBlur()">
@@ -36,5 +36,14 @@
     <br>
     <br>
     <canvas id="Canvas" width="0" height="0"></canvas>
+    <br>
+    <br>
+    <button onclick="sendFaceFeedback('False Negative')">못 찾은 얼굴이 있음</button>
+    <button onclick="sendFaceFeedback('False Positive')">얼굴이 아닌 곳을 가리킴</button>
+    <button onclick="sendFaceFeedback('Incorrect Box')">얼굴 위치가 안 맞음</button>
+    <br>
+    <button onclick="sendPlateFeedback('False Negative')">못 찾은 번호판이 있음</button>
+    <button onclick="sendPlateFeedback('False Positive')">번호판이 아닌 곳을 가리킴</button>
+    <button onclick="sendPlateFeedback('Incorrect Box')">번호판 위치가 안 맞음</button>
 </body>
 </html>

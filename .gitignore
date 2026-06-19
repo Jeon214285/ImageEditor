@@ -18,3 +18,5 @@ ml/data/
 # ml/mlflow.db
 yolo26n.pt
 actions-runner/
+google_key.json
+.env

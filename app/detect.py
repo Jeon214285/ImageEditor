@@ -1,10 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, Response, Form
+from fastapi import APIRouter, UploadFile, File, Response, Form, BackgroundTasks
 from fastapi.responses import JSONResponse
 import cv2
 import numpy as np
 import logging
 import time
 from ultralytics import YOLO
+from app.google_sheet_logger import append_prediction_log
 from app.model_loader import (
     load_face_champion_model, load_face_challenger_model,
     load_plate_champion_model, load_plate_challenger_model,
@@ -42,6 +43,7 @@ except Exception as e:
 # 사람 얼굴 탐지
 @router.post("/api/detect/face")
 async def process_face_detect(
+    background_tasks: BackgroundTasks,
     image: UploadFile = File(...),
     conf: float = Form(0.80)
 ):
@@ -69,9 +71,14 @@ async def process_face_detect(
         boxes = results[0].boxes
         
         detected_faces = []
+        detected_scores = []
+
         for box in boxes:
             x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
+            score = float(box.conf[0])
+
             detected_faces.append({"x": x1, "y": y1, "w": x2 - x1, "h": y2 - y1})
+            detected_scores.append(score)
             
             faces_count += 1
 
@@ -80,10 +87,11 @@ async def process_face_detect(
         total_duration = (time.time() - api_start_time) * 1000 # ms 단위
 
         # 탐지된 얼굴 개수 + 정보 로그에 출력
+        background_tasks.add_task(append_prediction_log, "face", detected_faces, detected_scores, serving_model)
         logger.info(f"FACE_DETECT_SUCCESS | FACES={faces_count} | ALGOTIME={algo_duration:.0f}ms | TOTALTIME={total_duration:.0f}ms")
 
-        return JSONResponse(content={"faces": detected_faces, "count": len(detected_faces),
-                                     "version": serving_model})
+        return JSONResponse(content={"faces": detected_faces, "scores": detected_scores,
+                                     "count": len(detected_faces), "version": serving_model})
     
     except Exception as e:
         logger.error(f"FACE_DETECT_SERVER_ERROR | ERROR={str(e)}")
@@ -93,6 +101,7 @@ async def process_face_detect(
 # 차량 번호판 탐지    
 @router.post("/api/detect/plate")
 async def process_plate_detect(
+    background_tasks: BackgroundTasks,
     image: UploadFile = File(...),
     conf: float = Form(0.80)
 ):
@@ -120,21 +129,27 @@ async def process_plate_detect(
         boxes = results[0].boxes
         
         detected_plates = []
+        detected_scores = []
+
         for box in boxes:
             x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
+            score = float(box.conf[0])
+
             detected_plates.append({"x": x1, "y": y1, "w": x2 - x1, "h": y2 - y1})
-            
+            detected_scores.append(score)
+
             plates_count += 1
 
         algo_duration = (time.time() - algo_start_time) * 1000 # ms 단위
 
         total_duration = (time.time() - api_start_time) * 1000 # ms 단위
 
-        # 탐지된 얼굴 개수 + 정보 로그에 출력
+        # 탐지된 번호판 개수 + 정보 로그에 출력
+        background_tasks.add_task(append_prediction_log, "plate", detected_plates, detected_scores, serving_model)
         logger.info(f"PLATE_DETECT_SUCCESS | PLATES={plates_count} | ALGOTIME={algo_duration:.0f}ms | TOTALTIME={total_duration:.0f}ms")
 
-        return JSONResponse(content={"plates": detected_plates, "count": len(detected_plates),
-                                     "version": serving_model})
+        return JSONResponse(content={"plates": detected_plates, "scores": detected_scores,
+                                     "count": len(detected_plates), "version": serving_model})
     
     except Exception as e:
         logger.error(f"PLATE_DETECT_SERVER_ERROR | ERROR={str(e)}")

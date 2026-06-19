@@ -1,8 +1,17 @@
-import sys, json, uuid, pytest
+import os, sys, json, uuid, pytest
 from pathlib import Path
 from urllib.parse import urlparse
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+os.environ["GOOGLE_SHEET_NAME"] = "dummy_test_sheet"
+os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"] = "{}"
+
+@pytest.fixture(autouse=True)
+def disable_google_sheet_logging():
+    with patch("app.google_sheet_logger.get_spreadsheet") as mock_get_sheet:
+        yield mock_get_sheet
 
 # js 파일 커버리지 계산
 @pytest.fixture(autouse=True)

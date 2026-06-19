@@ -102,6 +102,7 @@ export async function faceDetect() {
             const faces = result.faces;
             const count = result.count;
             state.modelType = result.version;
+            state.faceScores = result.scores;
 
             state.detectFaces = faces;
             
@@ -111,9 +112,10 @@ export async function faceDetect() {
             }
             
             // 로그 출력 포매팅 (여러개 일 수 있기 때문)
-            const faceDetails = faces.map((f, index) => 
-                `[${index + 1}] COOR=(${f.x}, ${f.y}) AREA=${f.w}x${f.h}px`
-            ).join(' | ');
+            const faceDetails = faces.map((f, index) => {
+                const score = (state.faceScores[index] * 100).toFixed(2); 
+                return `[${index + 1}] COOR=(${f.x}, ${f.y}) AREA=${f.w}x${f.h}px CONF=${score}%`;
+            }).join(' | ');
 
 
             fetch('/api/log', {
@@ -226,6 +228,7 @@ export async function plateDetect() {
             const plates = result.plates;
             const count = result.count;
             state.modelType = result.version;
+            state.plateScores = result.scores;
             
             state.detectPlates = plates;
             
@@ -235,9 +238,10 @@ export async function plateDetect() {
             }
             
             // 로그 출력 포매팅 (여러개 일 수 있기 때문)
-            const plateDetails = plates.map((f, index) => 
-                `[${index + 1}] COOR=(${f.x}, ${f.y}) AREA=${f.w}x${f.h}px`
-            ).join(' | ');
+            const plateDetails = plates.map((f, index) => {
+                const score = (state.plateScores[index] * 100).toFixed(2); 
+                return `[${index + 1}] COOR=(${f.x}, ${f.y}) AREA=${f.w}x${f.h}px CONF=${score}%`;
+            }).join(' | ');
 
 
             fetch('/api/log', {

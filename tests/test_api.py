@@ -20,6 +20,12 @@ def test_page():
     assert "차량 번호판 탐지" in response.text
     assert 'id="conf"' in response.text
     assert "모두 흐리게" in response.text
+    assert "못 찾은 얼굴이 있음" in response.text
+    assert "얼굴이 아닌 곳을 가리킴" in response.text
+    assert "얼굴 위치가 안 맞음" in response.text
+    assert "못 찾은 번호판이 있음" in response.text
+    assert "번호판이 아닌 곳을 가리킴" in response.text
+    assert "번호판 위치가 안 맞음" in response.text
 
 def test_favicon():
     response = client.get("/favicon.ico")
