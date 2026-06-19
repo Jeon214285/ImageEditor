@@ -29,7 +29,7 @@ split_data() # 데이터 준비
 
 os.chdir(BASE_DIR)  # ml 폴더에 학습 결과를 저장하기 위함
 
-client = MlflowClient()
+client = MlflowClient(tracking_uri=MLFLOW_TRACKING_URI, registry_uri=MLFLOW_TRACKING_URI)
 
 for info in model_info:
     best_map = -1.0
@@ -101,8 +101,8 @@ for info in model_info:
             registered_model_name=info['model_name']
         )
 
-        print(f"Wait 60 seconds")
-        time.sleep(60)  # 60초 대기
+        print(f"Wait 3 seconds")
+        time.sleep(3)  # 3초 대기
 
         latest_version = int(logged_model.registered_model_version)
 
