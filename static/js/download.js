@@ -19,6 +19,20 @@ export function imageDownload() {
         const resWidth = state.canvas.width;
         const resHeight = state.canvas.height;
 
+        const faceConfs = (state.faceSetConf === null) ? 1.00 : state.faceSetConf;
+        const plateConfs = (state.plateSetConf === null) ? 1.00 : state.plateSetConf;
+        if (faceConfs < plateConfs){
+            state.minConf = faceConfs;
+        } else {
+            state.minConf = plateConfs
+        }
+
+        fetch('/api/monitor/drift', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({score: state.minConf})
+        }).catch(err => console.error("Drift 모니터링 전송 실패", err));
+
         const link = document.createElement('a');
         link.href = dataURL;
         link.download = "image.png";

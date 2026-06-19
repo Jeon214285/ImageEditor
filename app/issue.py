@@ -25,13 +25,18 @@ class GitHubIssueHandler(logging.Handler):
             print(f"GITHUB EXCEPTION | ERROR={e}")
             traceback.print_exc()
 
-def create_github_issue(title: str, body: str) -> None:
+def create_github_issue(title: str, body: str, logger=None) -> None:
     repo = os.getenv("GH_REPO")
     token = os.getenv("GH_TOKEN")
 
-    if not repo or not token:
-        print("GH_ISSUE_REPO_TOKEN_WARNING | WARNING=GH_REPO/GH_TOKEN not set; skipping GitHub issue creation.")
-        return
+    if logger is not None:
+        if not repo or not token:
+            logger.warning("GH_ISSUE_REPO_TOKEN_WARNING | WARNING=GH_REPO/GH_TOKEN not set; skipping GitHub issue creation.")
+            return
+    else:
+        if not repo or not token:
+            print("GH_ISSUE_REPO_TOKEN_WARNING | WARNING=GH_REPO/GH_TOKEN not set; skipping GitHub issue creation.")
+            return
     
     url = f"https://api.github.com/repos/{repo}/issues"
     headers = {
