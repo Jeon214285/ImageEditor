@@ -1,22 +1,29 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from app.grabcut import router as grabcut_router
-from app.detect import router as detect_router
 import logging
-from pydantic import BaseModel
-from app.issue import *
 
-# 로그 포맷
+# 로그 포맷(모델 로드 시 로그 출력을 위해 import 전 설정)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(filename)s:%(lineno)d (%(funcName)s) | %(message)s"
 )
 logger = logging.getLogger()
 
-github_hadler = GitHubIssueHandler()
-github_hadler.setLevel(logging.ERROR)  # ERROR 이상만 보냄
-logger.addHandler(github_hadler)
+from app.grabcut import router as grabcut_router
+from app.detect import router as detect_router
+from pydantic import BaseModel
+from app.issue import *
+from app.config import LOW_CONFIDENCE_THRESHOLD
+from app.retrain_issue import update_issue_state
+
+github_handler = GitHubIssueHandler()
+github_handler.setLevel(logging.ERROR)  # ERROR 이상만 보냄
+logger.addHandler(github_handler)
+
+class DriftPayload(BaseModel):
+    score: float
+    modelType: str
 
 class LogData(BaseModel):
     level: str = 'INFO'  # 기본값 INFO
@@ -45,6 +52,16 @@ def home():
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("static/IE_favicon.ico")
+
+# drift
+@app.post("/api/monitor/drift")
+async def monitor_drift(
+    payload: DriftPayload,
+    background_tasks: BackgroundTasks  # 응답 지연 방지용
+):
+    background_tasks.add_task(update_issue_state, payload.score, LOW_CONFIDENCE_THRESHOLD, payload.modelType)
+
+    return {"status": "success"}
 
 # 로그 수집
 @app.post("/api/log")

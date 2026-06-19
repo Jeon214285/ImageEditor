@@ -101,6 +101,7 @@ export async function faceDetect() {
             const result = await response.json();
             const faces = result.faces;
             const count = result.count;
+            state.modelType = result.version;
 
             state.detectFaces = faces;
             
@@ -224,6 +225,7 @@ export async function plateDetect() {
             console.log("백엔드에서 받은 원본 데이터:", result);
             const plates = result.plates;
             const count = result.count;
+            state.modelType = result.version;
             
             state.detectPlates = plates;
             

@@ -100,8 +100,7 @@ for info in model_info:
             registered_model_name=info['model_name']
         )
 
-        latest_versions = client.search_model_versions(f"name='{info['model_name']}'")
-        latest_version = max(latest_versions, key=lambda v: int(v.version)).version
+        latest_version = logged_model.registered_model_version
 
         client.set_registered_model_alias(
             name=info['model_name'],

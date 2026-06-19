@@ -1,6 +1,6 @@
 task: detect
 mode: train
-model: C:\Users\214285\AppData\Local\Temp\tmpxxb0peq0\artifacts/last.pt
+model: C:\Users\214285\AppData\Local\Temp\tmp_6w123du\artifacts/last.pt
 data: C:\Users\214285\Desktop\ImageEditor\ml\plate_data.yaml
 epochs: 5
 time: null
