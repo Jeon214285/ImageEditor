@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from app.issue import *
 from app.config import LOW_CONFIDENCE_THRESHOLD
 from app.retrain_issue import update_issue_state
-from app.google_sheet_logger import append_prediction_log, append_feedback_log
+from app.google_sheet_logger import append_feedback_log
 from dotenv import load_dotenv
 
 load_dotenv()
