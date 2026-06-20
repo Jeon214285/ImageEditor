@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import logging
 import time
+import gc
 from ultralytics import YOLO
 from app.google_sheet_logger import append_prediction_log
 from app.model_loader import (
@@ -18,27 +19,9 @@ router = APIRouter()
 
 serving_model = select_serving_model()
 
-try:
-    if serving_model == "challenger":
-        face_model = load_face_challenger_model()
-        logger.info("FACE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE CHALLENGER MODEL FROM MLFLOW")
-    else: 
-        face_model = load_face_champion_model()
-        logger.info("FACE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE CHAMPION MODEL FROM MLFLOW")
-except Exception as e:
-    face_model = YOLO('yolo26n.pt')  # 모델이 없으면 기본모델(CI/CD 대비)
-    logger.warning(f"FACE_MODEL_LOAD_FAILED | EXCEPTION={e} | LOADED DEFAULT YOLO MODEL")
 
-try:
-    if serving_model == "challenger":
-        plate_model = load_plate_challenger_model()
-        logger.info("PLATE_MODEL_LOAD_SUCCESS | LOADED YOLO PLATE CHALLENGER MODEL FROM MLFLOW")
-    else:
-        plate_model = load_plate_champion_model()
-        logger.info("PLATE_MODEL_LOAD_SUCCESS | LOADED YOLO PLATE CHAMPION MODEL FROM MLFLOW")
-except Exception as e:
-    plate_model = YOLO('yolo26n.pt')  # 모델이 없으면 기본모델(CI/CD 대비)
-    logger.warning(f"PLATE_MODEL_LOAD_FAILED | EXCEPTION={e} | LOADED DEFAULT YOLO MODEL")
+
+
 
 # 사람 얼굴 탐지
 @router.post("/api/detect/face")
@@ -48,6 +31,17 @@ async def process_face_detect(
     conf: float = Form(0.80)
 ):
     api_start_time = time.time()
+
+    try:
+        if serving_model == "challenger":
+            face_model = load_face_challenger_model()
+            logger.info("FACE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE CHALLENGER MODEL FROM MLFLOW")
+        else: 
+            face_model = load_face_champion_model()
+            logger.info("FACE_MODEL_LOAD_SUCCESS | LOADED YOLO FACE CHAMPION MODEL FROM MLFLOW")
+    except Exception as e:
+        face_model = YOLO('yolo26n.pt')  # 모델이 없으면 기본모델(CI/CD 대비)
+        logger.warning(f"FACE_MODEL_LOAD_FAILED | EXCEPTION={e} | LOADED DEFAULT YOLO MODEL")
 
     try:
         contents = await image.read()
@@ -65,6 +59,10 @@ async def process_face_detect(
 
         # 모델 추론
         results = face_model.predict(source=[img], end2end=False, conf=conf)
+
+        # 추론 후 즉시 모델을 메모리에서 삭제
+        del face_model
+        gc.collect()
 
         # 탐지된 객체 정보 추출
         faces_count = 0
@@ -108,6 +106,18 @@ async def process_plate_detect(
     api_start_time = time.time()
 
     try:
+        if serving_model == "challenger":
+            plate_model = load_plate_challenger_model()
+            logger.info("PLATE_MODEL_LOAD_SUCCESS | LOADED YOLO PLATE CHALLENGER MODEL FROM MLFLOW")
+        else:
+            plate_model = load_plate_champion_model()
+            logger.info("PLATE_MODEL_LOAD_SUCCESS | LOADED YOLO PLATE CHAMPION MODEL FROM MLFLOW")
+    except Exception as e:
+        plate_model = YOLO('yolo26n.pt')  # 모델이 없으면 기본모델(CI/CD 대비)
+        logger.warning(f"PLATE_MODEL_LOAD_FAILED | EXCEPTION={e} | LOADED DEFAULT YOLO MODEL")
+
+
+    try:
         contents = await image.read()
         nparr = np.frombuffer(contents, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -123,6 +133,10 @@ async def process_plate_detect(
 
         # 모델 추론
         results = plate_model.predict(source=[img], end2end=False, conf=conf)
+
+        # 추론 후 즉시 모델을 메모리에서 삭제
+        del plate_model
+        gc.collect()
 
         # 탐지된 객체 정보 추출
         plates_count = 0
